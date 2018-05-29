@@ -1,14 +1,14 @@
 package controllers
 
-import (
-	"github.com/astaxie/beego"
-)
-
 type IndexController struct {
-	beego.Controller
+	BaseController
 }
 
 func (c *IndexController) Get() {
-	c.Data["IsLogin"] = c.GetSession("userinfo") != nil
+	c.Load()
 	c.TplName = "index.html"
+	
+	if c.GetSession("isTeacher") == true {
+		c.TplName = "teacher/dashboard.html"
+	}
 }

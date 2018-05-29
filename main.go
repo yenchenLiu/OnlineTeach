@@ -1,6 +1,7 @@
 package main
 
 import (
+	"WebPartice/controllers"
 	"WebPartice/models"
 	_ "WebPartice/routers"
 	"fmt"
@@ -13,7 +14,6 @@ import (
 func init() {
 	orm.RegisterDriver("sqlite3", orm.DRSqlite)
 	orm.RegisterDataBase("default", "sqlite3", "./test.db")
-	fmt.Println("test")
 	// Error.
 	force := true
 	verbose := true
@@ -29,7 +29,9 @@ func main() {
 	o := orm.NewOrm()
 	o.Using("default")
 	profile := new(models.Profile)
-	profile.Name = "yenchen"
+	profile.FirstName = "Yenchen"
+	profile.LastName = "Liu"
+	profile.Identity = "teacher"
 
 	user := new(models.User)
 	user.Profile = profile
@@ -38,5 +40,7 @@ func main() {
 
 	fmt.Println(o.Insert(profile))
 	fmt.Println(o.Insert(user))
+
+	beego.ErrorController(&controllers.ErrorController{})
 	beego.Run()
 }

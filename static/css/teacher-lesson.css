@@ -1,0 +1,14 @@
+#lesson_table {
+    display:table;
+}
+.lesson_tr {
+    display: table-row;
+}
+.lesson_td {
+    display: table-cell;
+    border-style: solid;
+    border-width: 1px;
+    margin: auto;
+    text-align: center;
+    padding: 3px;
+}

@@ -82,7 +82,6 @@ func (c *AuthController) GetLogin() *models.User {
 	return u
 }
 
-// @router /t
 func (c *AuthController) Login() {
 	c.Prepare()
 	if c.IsLogin {

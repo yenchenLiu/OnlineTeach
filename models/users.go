@@ -18,8 +18,9 @@ type User struct {
 // Profile 使用者個人資料
 type Profile struct {
 	Id   int
-	Name string
-	Age  int16
+	FirstName string
+	LastName string
+	Identity  string
 	User *User `orm:"reverse(one)"` // Reverse relationship (optional)
 }
 
@@ -38,6 +39,20 @@ func (m *User) Read(fields ...string) error {
 
 func (m *User) Update(fields ...string) error {
 	if _, err := orm.NewOrm().Update(m, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *User) LoadProfile() error {
+	if _, err := orm.NewOrm().LoadRelated(m, "Profile"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Profile) Read(fields ...string) error {
+	if err := orm.NewOrm().Read(m, fields...); err != nil {
 		return err
 	}
 	return nil
