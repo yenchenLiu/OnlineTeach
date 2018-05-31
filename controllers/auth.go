@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"WebPartice/models"
+	"crypto/sha256"
+	"encoding/base64"
 	"errors"
 	"html/template"
 	"time"
@@ -30,6 +32,30 @@ func Authenticate(email string, password string) (user *models.User, err error) 
 		user.Update("Lastlogintime")
 		return user, nil
 	}
+}
+
+func SignupStudent(u *models.User, p *models.Profile) (int, error) {
+	var (
+		err error
+		msg string
+	)
+
+	if models.Users().Filter("email", u.Email).Exist() {
+		msg = "was already regsitered input email address."
+		return 0, errors.New(msg)
+	}
+
+	h := sha256.New()
+	h.Write([]byte(u.Email))
+	h.Write([]byte(u.Password))
+	u.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
+
+	err = u.Insert(p)
+	if err != nil {
+		return 0, err
+	}
+
+	return u.Id, err
 }
 
 func IsValid(model interface{}) (err error) {
@@ -67,7 +93,7 @@ func (c *AuthController) SetLogin(user *models.User) {
 }
 
 func (c *AuthController) DelLogin() {
-	c.DelSession("userinfo")
+	c.DestroySession()
 }
 
 func (c *AuthController) Prepare() {
@@ -94,7 +120,11 @@ func (c *AuthController) Login() {
 	email := c.GetString("Email")
 	password := c.GetString("Password")
 
-	user, err := Authenticate(email, password)
+	h := sha256.New()
+	h.Write([]byte(email))
+	h.Write([]byte(password))
+
+	user, err := Authenticate(email, string(base64.URLEncoding.EncodeToString(h.Sum(nil))))
 	if err != nil || user.Id < 1 {
 		flash.Warning(err.Error())
 		flash.Store(&c.Controller)
@@ -119,7 +149,7 @@ func (c *AuthController) Logout() {
 }
 
 func (c *AuthController) Signup() {
-	c.TplName = "login/signup.tpl"
+	c.TplName = "signup.html"
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 
 	if !c.Ctx.Input.IsPost() {
@@ -135,18 +165,42 @@ func (c *AuthController) Signup() {
 		flash.Store(&c.Controller)
 		return
 	}
+	p := &models.Profile{}
+	if err = c.ParseForm(p); err != nil {
+		flash.Error("Signup invalid!")
+		flash.Store(&c.Controller)
+		return
+	}
 	if err = IsValid(u); err != nil {
 		flash.Error(err.Error())
 		flash.Store(&c.Controller)
 		return
 	}
 
-	// id, err := lib.SignupUser(u)
-	// if err != nil || id < 1 {
-	// 	flash.Warning(err.Error())
-	// 	flash.Store(&c.Controller)
-	// 	return
-	// }
+	identity := c.Input()["Identity"]
+	if len(identity) == 0 {
+		flash.Warning("Please choose your identity.")
+		flash.Store(&c.Controller)
+		return
+	}
+	p.Identity = identity[0]
+	if identity[0] == "student" {
+		id, err := SignupStudent(u, p)
+		if err != nil || id < 1 {
+			flash.Warning(err.Error())
+			flash.Store(&c.Controller)
+			return
+		}
+	} else if identity[0] == "teacher" {
+		// TODO register teacher
+		flash.Warning("Not yet complete")
+		flash.Store(&c.Controller)
+		return
+	} else {
+		flash.Warning("Signup invalid!")
+		flash.Store(&c.Controller)
+		return
+	}
 
 	flash.Success("Register user")
 	flash.Store(&c.Controller)

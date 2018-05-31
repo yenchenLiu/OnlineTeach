@@ -26,7 +26,7 @@ func (c *BaseController) Load() {
 			IsTeacher := user.Profile.Identity == "teacher"
 			c.SetSession("isTeacher", IsTeacher)
 		}
-		c.Data["Name"] = user.Profile.FirstName
+		c.Data["Name"] = user.Profile.Name
 		c.Data["Identity"] = user.Profile.Identity
 	}
 }

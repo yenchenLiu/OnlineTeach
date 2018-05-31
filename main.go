@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/base64"
+	"crypto/sha256"
 	"WebPartice/controllers"
 	"WebPartice/models"
 	_ "WebPartice/routers"
@@ -29,14 +31,17 @@ func main() {
 	o := orm.NewOrm()
 	o.Using("default")
 	profile := new(models.Profile)
-	profile.FirstName = "Yenchen"
-	profile.LastName = "Liu"
+	profile.Name = "Yenchen"
 	profile.Identity = "teacher"
 
 	user := new(models.User)
 	user.Profile = profile
 	user.Email = "mail@daychen.tw"
 	user.Password = "yenchen"
+	h := sha256.New()
+	h.Write([]byte(user.Email))
+	h.Write([]byte(user.Password))
+	user.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
 
 	fmt.Println(o.Insert(profile))
 	fmt.Println(o.Insert(user))
