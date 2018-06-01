@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/base64"
-	"crypto/sha256"
 	"WebPartice/controllers"
 	"WebPartice/models"
 	_ "WebPartice/routers"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/astaxie/beego"
@@ -32,7 +32,7 @@ func main() {
 	o.Using("default")
 	profile := new(models.Profile)
 	profile.Name = "Yenchen"
-	profile.Identity = "teacher"
+	profile.Identity = "admin"
 
 	user := new(models.User)
 	user.Profile = profile

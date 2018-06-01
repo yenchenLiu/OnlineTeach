@@ -1,0 +1,58 @@
+{{ template "layout.html" .}}
+
+{{ define "Title" }}
+註冊
+{{ end }}
+{{ define "Content" }}
+<div class="reg-w3">
+<div class="w3layouts-main">
+	<h2>Register Now</h2>
+	{{ if .flash.warning }}
+	<h4 style="color:red">{{.flash.warning}}</h4>
+	{{ end }}
+		<form action="#" method="post"  enctype="multipart/form-data">
+			{{ .xsrfdata }}
+			
+            <div class="form-group">
+                <label for="TeachingYears">Year of teaching experience</label>
+                <input type="number" min=1 setp="1" class="ggg" id="TeachingYears" name="TeachingYears" value="1" required="">
+            </div>
+
+            <div class="form-group">
+                <label for="Proficiency">Write your proficiency</label>
+                <textarea class="wysihtml5 form-control" rows="9" id="Proficiency" name="Proficiency"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="ResumeFile">Upload your Resume File</label>
+                <input type="file" id="ResumeFile" name="ResumeFile">
+                <p class="help-block">We will review your resume.<br/>Your file format must be PDF.</p>
+            </div>
+            <div class="form-group">
+                <label for="WantedStudents">Wanted Students</label>
+			<div class="checkbox">
+                <label>
+                    <input type="checkbox" name="TeacherTags[]" value="Child"> Child 
+                </label>
+                <label>
+                    <input type="checkbox" name="TeacherTags[]" value="Beginner"> Beginner 
+                </label>
+                <label>
+                    <input type="checkbox" name="TeacherTags[]" value="Advanced"> Advanced 
+                </label>
+                <label>
+                    <input type="checkbox" name="TeacherTags[]" value="TOEIC"> TOEIC 
+                </label>
+                <label>
+                    <input type="checkbox" name="TeacherTags[]" value="TOFEL"> TOFEL 
+                </label>
+            </div>
+        </div>
+                
+				<div class="clearfix"></div>
+				<input type="submit" value="submit" name="register">
+		</form>
+		<p>Cancel Registered.<a href="/logout.html">Cancel</a></p>
+</div>
+</div>
+{{ end }}

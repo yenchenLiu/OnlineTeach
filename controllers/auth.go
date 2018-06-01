@@ -2,10 +2,14 @@ package controllers
 
 import (
 	"WebPartice/models"
+	"crypto/md5"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"errors"
 	"html/template"
+	"net/url"
+	"path"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -34,7 +38,7 @@ func Authenticate(email string, password string) (user *models.User, err error) 
 	}
 }
 
-func SignupStudent(u *models.User, p *models.Profile) (int, error) {
+func SignupVerify(u *models.User, p *models.Profile) error {
 	var (
 		err error
 		msg string
@@ -42,15 +46,40 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 
 	if models.Users().Filter("email", u.Email).Exist() {
 		msg = "was already regsitered input email address."
-		return 0, errors.New(msg)
+		return errors.New(msg)
 	}
+
+	return err
+}
+
+func SignupTeacher(u *models.User, p *models.Profile, t *models.Teacher, tg *models.TeacherTags) (int, error) {
+	var (
+		err error
+	)
 
 	h := sha256.New()
 	h.Write([]byte(u.Email))
 	h.Write([]byte(u.Password))
 	u.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
 
-	err = u.Insert(p)
+	err = u.InsertTeacher(p, t, tg)
+	if err != nil {
+		return 0, err
+	}
+	return u.Id, err
+}
+
+func SignupStudent(u *models.User, p *models.Profile) (int, error) {
+	var (
+		err error
+	)
+
+	h := sha256.New()
+	h.Write([]byte(u.Email))
+	h.Write([]byte(u.Password))
+	u.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
+
+	err = u.InsertStudent(p)
 	if err != nil {
 		return 0, err
 	}
@@ -81,7 +110,7 @@ type AuthController struct {
 func (c *AuthController) Get() {
 	c.Prepare()
 	if c.IsLogin {
-		c.Ctx.Redirect(302, c.URLFor("UsersController.Index"))
+		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
 		return
 	}
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
@@ -111,7 +140,7 @@ func (c *AuthController) GetLogin() *models.User {
 func (c *AuthController) Login() {
 	c.Prepare()
 	if c.IsLogin {
-		c.Ctx.Redirect(302, c.URLFor("UsersController.Index"))
+		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
 		return
 	}
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
@@ -153,6 +182,9 @@ func (c *AuthController) Signup() {
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 
 	if !c.Ctx.Input.IsPost() {
+		if c.GetSession("RegisterTeacher") != nil {
+			c.Redirect(c.URLFor("AuthController.SignupTeacher"), 303)
+		}
 		return
 	}
 
@@ -185,6 +217,12 @@ func (c *AuthController) Signup() {
 	}
 	p.Identity = identity[0]
 	if identity[0] == "student" {
+		err := SignupVerify(u, p)
+		if err != nil {
+			flash.Warning(err.Error())
+			flash.Store(&c.Controller)
+			return
+		}
 		id, err := SignupStudent(u, p)
 		if err != nil || id < 1 {
 			flash.Warning(err.Error())
@@ -192,10 +230,19 @@ func (c *AuthController) Signup() {
 			return
 		}
 	} else if identity[0] == "teacher" {
-		// TODO register teacher
-		flash.Warning("Not yet complete")
-		flash.Store(&c.Controller)
+
+		// TODO 注意是否是傳指標
+		c.SetSession("RegisterTeacher", c.Input())
+		err := SignupVerify(u, p)
+		if err != nil {
+			c.DestroySession()
+			flash.Warning(err.Error())
+			flash.Store(&c.Controller)
+			return
+		}
+		c.Redirect(c.URLFor("AuthController.SignupTeacher"), 303)
 		return
+
 	} else {
 		flash.Warning("Signup invalid!")
 		flash.Store(&c.Controller)
@@ -207,5 +254,82 @@ func (c *AuthController) Signup() {
 
 	c.SetLogin(u)
 
-	c.Redirect(c.URLFor("UsersController.Index"), 303)
+	c.Redirect(c.URLFor("IndexController.Get"), 303)
+}
+
+func (c *AuthController) SignupTeacher() {
+	if c.GetSession("RegisterTeacher") == nil {
+		c.Redirect(c.URLFor("IndexController.Get"), 303)
+	}
+	c.TplName = "teacher/signup.html"
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+	if !c.Ctx.Input.IsPost() {
+		return
+	}
+	flash := beego.NewFlash()
+	_, header, err := c.GetFile("ResumeFile")
+	if err != nil {
+		flash.Warning(err.Error())
+		flash.Store(&c.Controller)
+		return
+	}
+	if path.Ext(header.Filename) != ".pdf" {
+		flash.Warning("Please upload pdf file.")
+		flash.Store(&c.Controller)
+		return
+	}
+
+	register := c.GetSession("RegisterTeacher").(url.Values)
+
+	user := new(models.User)
+	profile := new(models.Profile)
+	tg := new(models.TeacherTags)
+	t := &models.Teacher{}
+	if err = c.ParseForm(t); err != nil {
+		flash.Error("Signup invalid!")
+		flash.Store(&c.Controller)
+		return
+	}
+	for _, v := range c.Input()["TeacherTags[]"] {
+		switch v {
+		case "Child":
+			tg.Child = true
+			fallthrough
+		case "Beginner":
+			tg.Beginner = true
+		case "Advanced":
+			tg.Advanced = true
+		case "TOEIC":
+			tg.TOEIC = true
+		case "TOFEL":
+			tg.TOFEL = true
+		}
+	}
+
+	profile.Identity = register["Identity"][0]
+	profile.Name = register["Name"][0]
+	user.Email = register["Email"][0]
+	user.Password = register["Password"][0]
+	b := []byte(register["Email"][0])
+	has := md5.Sum(b)
+	filename := hex.EncodeToString(has[:])
+	t.Resume = filename + ".pdf"
+	if err := c.SaveToFile("ResumeFile", "./resumes/"+filename+".pdf"); err != nil {
+		flash.Warning(err.Error())
+		flash.Store(&c.Controller)
+		return
+	}
+
+	id, err := SignupTeacher(user, profile, t, tg)
+	if err != nil || id < 1 {
+		flash.Warning(err.Error())
+		flash.Store(&c.Controller)
+		return
+	}
+
+	flash.Success("Register user")
+	flash.Store(&c.Controller)
+	c.DelSession("RegisterTeacher")
+	c.SetLogin(user)
+	c.Redirect(c.URLFor("IndexController.Get"), 303)
 }
