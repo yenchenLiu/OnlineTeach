@@ -8,6 +8,9 @@
 <div class="log-w3">
 <div class="w3layouts-main">
 	<h2>Sign In Now</h2>
+	{{ if .flash.notice }}
+	<h4 style="color:green">{{.flash.notice}}</h4>
+	{{ end }}
 	{{ if .flash.warning }}
 	<h4 style="color:red">{{.flash.warning}}</h4>
 	{{ end }}

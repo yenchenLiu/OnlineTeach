@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"WebPartice/lib"
 	"WebPartice/models"
 	"crypto/md5"
 	"crypto/sha256"
@@ -66,6 +67,15 @@ func SignupTeacher(u *models.User, p *models.Profile, t *models.Teacher, tg *mod
 	if err != nil {
 		return 0, err
 	}
+
+	userData := new(models.UserData)
+	emailVerify := string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
+	userData.User = u
+	userData.Type = "emailVerify"
+	userData.Data = emailVerify
+	userData.Insert()
+
+	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
 	return u.Id, err
 }
 
@@ -79,11 +89,21 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 	h.Write([]byte(u.Password))
 	u.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
 
+	h = sha256.New()
+	h.Write([]byte(u.Email))
+	h.Write([]byte(time.Now().String()))
 	err = u.InsertStudent(p)
 	if err != nil {
 		return 0, err
 	}
 
+	userData := new(models.UserData)
+	emailVerify := string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
+	userData.User = u
+	userData.Type = "emailVerify"
+	userData.Data = emailVerify
+	userData.Insert()
+	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
 	return u.Id, err
 }
 
@@ -115,6 +135,22 @@ func (c *AuthController) Get() {
 	}
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "login.html"
+}
+
+func (c *AuthController) VerifyEmail() {
+	flash := beego.NewFlash()
+
+	if err := models.VerifyEmail(c.GetString(":verify")); err != nil {
+		flash.Warning(err.Error())
+		flash.Store(&c.Controller)
+		c.Ctx.Redirect(302, c.URLFor("AuthController.Login"))
+		return
+	}
+
+	flash.Notice("Success verify your account, please login again.")
+	flash.Store(&c.Controller)
+	c.DelSession("userinfo")
+	c.Ctx.Redirect(302, c.URLFor("AuthController.Login"))
 }
 
 func (c *AuthController) SetLogin(user *models.User) {
@@ -174,7 +210,7 @@ func (c *AuthController) Logout() {
 	flash.Success("Success logged out")
 	flash.Store(&c.Controller)
 
-	c.Ctx.Redirect(302, c.URLFor("LoginController.Login"))
+	c.Ctx.Redirect(302, c.URLFor("AuthController.Login"))
 }
 
 func (c *AuthController) Signup() {

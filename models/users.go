@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -11,10 +12,20 @@ type User struct {
 	Id            int
 	Email         string
 	Password      string
-	Registertime  time.Time `orm:"auto_now_add;type(datetime)"`
-	Lastlogintime time.Time `orm:"type(datetime);null" form:"-"`
-	IsActive      bool      `orm:"default(false)"`
-	Profile       *Profile  `orm:"rel(one)";` // OneToOne relation
+	Registertime  time.Time   `orm:"auto_now_add;type(datetime)"`
+	Lastlogintime time.Time   `orm:"type(datetime);null" form:"-"`
+	IsActive      bool        `orm:"default(false)"`
+	Profile       *Profile    `orm:"rel(one)";`     // OneToOne relation
+	UserData      []*UserData `orm:"reverse(many)"` // reverse relationship of fk
+}
+
+type UserData struct {
+	Id      int
+	Type    string
+	Data    string    `orm:"type(text)"`
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
+	User    *User     `orm:"rel(fk)"` // RelForeignKey relation
 }
 
 // Profile 使用者個人資料
@@ -50,7 +61,7 @@ type TeacherTags struct {
 
 func init() {
 	// Need to register model in init
-	orm.RegisterModel(new(User), new(Profile), new(Teacher), new(TeacherTags))
+	orm.RegisterModel(new(User), new(Profile), new(Teacher), new(TeacherTags), new(UserData))
 
 }
 
@@ -102,6 +113,41 @@ func (m *User) InsertTeacher(p *Profile, t *Teacher, tg *TeacherTags) error {
 
 func (m *User) LoadProfile() error {
 	if _, err := orm.NewOrm().LoadRelated(m, "Profile"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *UserData) Insert() error {
+	if _, err := orm.NewOrm().Insert(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+func VerifyEmail(emailData string) error {
+	var m UserData
+	o := orm.NewOrm()
+	err := o.QueryTable(m).Filter("type", "emailVerify").Filter("data", emailData).One(&m)
+	if err == orm.ErrMultiRows {
+		// Have multiple records
+		return errors.New("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// No result
+		return errors.New("Not row found")
+	}
+	user := m.User
+	user.IsActive = true
+	err = user.Update("IsActive")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *UserData) Update(fields ...string) error {
+	if _, err := orm.NewOrm().Update(m, fields...); err != nil {
 		return err
 	}
 	return nil
