@@ -10,9 +10,18 @@ type BaseController struct {
 	beego.Controller
 }
 
+func (c *BaseController) LoadSession() {
+	c.Data["IsLogin"] = c.GetSession("IsLogin")
+	c.Data["IsTeacher"] = c.GetSession("IsTeacher")
+	c.Data["IsAdmin"] = c.GetSession("IsAdmin")
+	c.Data["Name"] = c.GetSession("Name")
+	c.Data["Identity"] = c.GetSession("Identity")
+
+}
+
 func (c *BaseController) Load() {
 	IsLogin := c.GetSession("userinfo") != nil
-	c.Data["IsLogin"] = IsLogin
+	c.SetSession("IsLogin", IsLogin)
 	if IsLogin {
 		user := &models.User{Id: c.GetSession("userinfo").(int)}
 		user.Read()
@@ -25,11 +34,25 @@ func (c *BaseController) Load() {
 		}
 
 		user.LoadProfile()
-		if c.GetSession("isTeacher") == nil {
+		if c.GetSession("IsTeacher") == nil {
 			IsTeacher := user.Profile.Identity == "teacher"
-			c.SetSession("isTeacher", IsTeacher)
+			c.SetSession("IsTeacher", IsTeacher)
+			if IsTeacher == true {
+				user.Profile.LoadTeacher()
+				if IsTeacherActive := user.Profile.Teacher.IsActive; IsTeacherActive == false {
+					flash := beego.NewFlash()
+					flash.Warning("The resume is under review and will be notified by email when the audit is approved.")
+					flash.Store(&c.Controller)
+					c.Abort("403")
+					return
+				}
+			}
 		}
-		c.Data["Name"] = user.Profile.Name
-		c.Data["Identity"] = user.Profile.Identity
+		if c.GetSession("IsAdmin") == nil {
+			IsTeacher := user.Profile.Identity == "admin"
+			c.SetSession("IsAdmin", IsTeacher)
+		}
+		c.SetSession("Name", user.Profile.Name)
+		c.SetSession("Identity", user.Profile.Identity)
 	}
 }

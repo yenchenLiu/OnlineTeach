@@ -17,7 +17,7 @@ func init() {
 	orm.RegisterDriver("sqlite3", orm.DRSqlite)
 	orm.RegisterDataBase("default", "sqlite3", "./test.db")
 	// Error.
-	force := true
+	force := false
 	verbose := true
 	err := orm.RunSyncdb("default", force, verbose)
 	if err != nil {
@@ -30,6 +30,8 @@ func main() {
 	orm.Debug = true
 	o := orm.NewOrm()
 	o.Using("default")
+
+	err := o.Begin()
 	profile := new(models.Profile)
 	profile.Name = "Yenchen"
 	profile.Identity = "admin"
@@ -38,13 +40,22 @@ func main() {
 	user.Profile = profile
 	user.Email = "mail@daychen.tw"
 	user.Password = "yenchen"
+	user.IsActive = true
 	h := sha256.New()
 	h.Write([]byte(user.Email))
 	h.Write([]byte(user.Password))
 	user.Password = string(base64.URLEncoding.EncodeToString(h.Sum(nil)))
-
-	fmt.Println(o.Insert(profile))
-	fmt.Println(o.Insert(user))
+	if err == nil {
+		_, err = o.Insert(profile)
+	}
+	if err == nil {
+		_, err = o.Insert(user)
+	}
+	if err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
+	}
 
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Run()

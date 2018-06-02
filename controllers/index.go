@@ -5,10 +5,13 @@ type IndexController struct {
 }
 
 func (c *IndexController) Get() {
-	c.Load()
 	c.TplName = "index.html"
-	
-	if c.GetSession("isTeacher") == true {
+	c.LoadSession()
+	if c.GetSession("IsTeacher") == true {
 		c.TplName = "teacher/dashboard.html"
+	}
+
+	if c.GetSession("IsAdmin") == true {
+		c.TplName = "admin/dashboard.html"
 	}
 }

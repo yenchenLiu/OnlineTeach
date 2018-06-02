@@ -5,10 +5,10 @@ type LessonController struct {
 }
 
 func (c *LessonController) Get() {
-	c.Load()
-	if c.GetSession("isTeacher") != true {
+	if c.GetSession("IsTeacher") != true {
 		c.Abort("401")
 	}
+	c.LoadSession()
 	var lesson [24][7]bool
 	for index := 7; index <= 18; index++ {
 		lesson[index][0] = true

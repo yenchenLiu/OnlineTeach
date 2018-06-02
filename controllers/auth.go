@@ -122,7 +122,7 @@ func IsValid(model interface{}) (err error) {
 
 // AuthController 使用者控制器，含是否登陸資訊
 type AuthController struct {
-	beego.Controller
+	BaseController
 	Userinfo *models.User
 	IsLogin  bool
 }
@@ -200,7 +200,7 @@ func (c *AuthController) Login() {
 	flash.Store(&c.Controller)
 
 	c.SetLogin(user)
-
+	c.Load()
 	c.Redirect(c.URLFor("IndexController.Get"), 303)
 }
 
@@ -344,6 +344,7 @@ func (c *AuthController) SignupTeacher() {
 
 	profile.Identity = register["Identity"][0]
 	profile.Name = register["Name"][0]
+	profile.Skype = register["Skype"][0]
 	user.Email = register["Email"][0]
 	user.Password = register["Password"][0]
 	b := []byte(register["Email"][0])
