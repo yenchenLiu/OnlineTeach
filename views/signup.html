@@ -8,7 +8,9 @@
 <div class="w3layouts-main">
 	<h2>Register Now</h2>
 	{{ if .flash.warning }}
-	<h4 style="color:red">{{.flash.warning}}</h4>
+		<div class="alert alert-danger" role="alert">
+			<strong>Error!</strong> {{.flash.warning}}
+		</div>
 	{{ end }}
 		<form action="#" method="post">
 			{{ .xsrfdata }}

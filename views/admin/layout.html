@@ -255,14 +255,14 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
             <div class="leftside-navigation">
                 <ul class="sidebar-menu" id="nav-accordion">
                     <li>
-                        <a class="active" href="/index.html">
+                        <a {{if eq .Uri "/index"}} class="active" {{end}} href="/index">
                             <i class="fa fa-dashboard"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
 
                     <li>
-                        <a href="/admin/reviewresume">
+                        <a {{if eq .Uri "/admin/reviewresume"}} class="active" {{end}} href="/admin/reviewresume">
                             <i class="glyphicon glyphicon-th-list"></i>
                             <span>Review Resume</span>
                         </a>

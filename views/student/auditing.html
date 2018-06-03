@@ -1,0 +1,128 @@
+{{template "student/layout.html" .}}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<section id="main-content">
+  <section class="wrapper">
+        <div class="table-agile-info">
+                <div class="panel panel-default">
+                   <div class="panel-heading">
+                    安排試聽資料
+                   </div>
+                   <div>
+                     <table class="table" ui-jq="footable" ui-options="{
+                       &quot;paging&quot;: {
+                         &quot;enabled&quot;: true
+                       },
+                       &quot;filtering&quot;: {
+                         &quot;enabled&quot;: true
+                       },
+                       &quot;sorting&quot;: {
+                         &quot;enabled&quot;: true
+                       }}">
+                       <thead>
+                         <tr>
+                           <th>上課時間</th>
+                           <th>First Name</th>
+                           <th>安排狀況</th>
+                           <th>老師編號</th>
+                           <th>老師姓名</th>
+                           <th>老師Skype</th>
+                           <th>上課日期</th>
+                           <th></th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                         <tr data-expanded="true">
+                           <td>星期X的6:00</td>
+                           <td>Dennise</td>
+                           <td>安排中</td>
+                           <td></td>
+                           <td></td>
+                           <td></td>
+                           <td></td>
+                           <td>取消申請</td>
+                         </tr>
+                         
+                       </tbody>
+                     </table>
+                     
+                   </div>
+                   
+                 </div>
+                 <label>課程安排好後會以電子郵件通知，請注意電子郵件或回到網站上看最新安排情況。</label>
+                 <div class="position-center ">
+                        <div class="text-center">
+                            <a href="#myModal" data-toggle="modal" class="btn btn-success">
+                                申請試聽
+                            </a>
+                        </div>
+
+                        <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button>
+                                    <h4 class="modal-title">申請試聽</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <label>請輸入要試聽的資料以及時段</label>
+                                    <form role="form" method="POST">
+                                        {{.xsrfdata}}
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label col-lg-3" for="inputSuccess">上課時間：</label>
+                                            <div class="col-lg-6">
+                                                <select class="form-control m-bot15">
+                                                    <option value="0">星期日</option>
+                                                    <option value="1">星期一</option>
+                                                    <option value="2">星期二</option>
+                                                    <option value="3">星期三</option>
+                                                    <option value="4">星期四</option>
+                                                    <option value="5">星期五</option>
+                                                    <option value="6">星期六</option>
+                                                </select>
+                                                <div class="form-group">
+                            
+                                                        <select class="form-control m-bot15">
+                                                                <option value="6">6:00</option>
+                                                                <option value="7">7:00</option>
+                                                                <option value="8">8:00</option>
+                                                                <option value="9">9:00</option>
+                                                                <option value="10">10:00</option>
+                                                                <option value="11">11:00</option>
+                                                                <option value="12">12:00</option>
+                                                                <option value="13">13:00</option>
+                                                                <option value="14">14:00</option>
+                                                                <option value="15">15:00</option>
+                                                                <option value="16">16:00</option>
+                                                                <option value="17">17:00</option>
+                                                                <option value="18">18:00</option>
+                                                                <option value="19">19:00</option>
+                                                                <option value="20">20:00</option>
+                                                                <option value="21">21:00</option>
+                                                                <option value="22">22:00</option>
+                                                                <option value="23">23:00</option>
+                                                        </select>
+                                                </div>
+                                        </div>
+                                        <label></label>
+                                        <div class="form-group">
+                                        <button type="submit" class="btn btn-default">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+               </div>
+  </section>
+</section>
+{{ end }}
+
+{{ define "Scripts"}}
+{{ end }}

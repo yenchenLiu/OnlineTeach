@@ -11,6 +11,10 @@ func (c *IndexController) Get() {
 		c.TplName = "teacher/dashboard.html"
 	}
 
+	if c.GetSession("IsStudent") == true {
+		c.TplName = "student/dashboard.html"
+	}
+
 	if c.GetSession("IsAdmin") == true {
 		c.TplName = "admin/dashboard.html"
 	}

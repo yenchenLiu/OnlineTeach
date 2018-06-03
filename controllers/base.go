@@ -12,10 +12,12 @@ type BaseController struct {
 
 func (c *BaseController) LoadSession() {
 	c.Data["IsLogin"] = c.GetSession("IsLogin")
+	c.Data["IsStudent"] = c.GetSession("IsStudent")
 	c.Data["IsTeacher"] = c.GetSession("IsTeacher")
 	c.Data["IsAdmin"] = c.GetSession("IsAdmin")
 	c.Data["Name"] = c.GetSession("Name")
 	c.Data["Identity"] = c.GetSession("Identity")
+	c.Data["Uri"] = c.Ctx.Input.URI()
 
 }
 
@@ -48,6 +50,11 @@ func (c *BaseController) Load() {
 				}
 			}
 		}
+		if c.GetSession("IsStudent") == nil {
+			IsStudent := user.Profile.Identity == "student"
+			c.SetSession("IsStudent", IsStudent)
+		}
+
 		if c.GetSession("IsAdmin") == nil {
 			IsTeacher := user.Profile.Identity == "admin"
 			c.SetSession("IsAdmin", IsTeacher)
