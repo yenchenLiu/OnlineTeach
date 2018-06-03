@@ -4,6 +4,7 @@ import (
 	"WebPartice/controllers"
 	"WebPartice/models"
 	_ "WebPartice/routers"
+	"WebPartice/lib"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -57,6 +58,7 @@ func main() {
 		o.Commit()
 	}
 
+	beego.AddFuncMap("AddNumber", lib.AddNumber)
 	beego.ErrorController(&controllers.ErrorController{})
 	beego.Run()
 }
