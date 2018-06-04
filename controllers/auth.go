@@ -366,7 +366,6 @@ func (c *AuthController) SignupTeacher() {
 
 	flash.Success("Register user")
 	flash.Store(&c.Controller)
-	c.DelSession("RegisterTeacher")
-	c.SetLogin(user)
+	c.DestroySession()
 	c.Redirect(c.URLFor("IndexController.Get"), 303)
 }

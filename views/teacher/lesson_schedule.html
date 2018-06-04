@@ -1,5 +1,8 @@
 {{template "teacher/layout.html" .}}
 
+{{ define "Title" }}
+	Teacher|Lesson
+{{ end }}
 {{ define "Head" }}
 <link href="/static/css/teacher-lesson.css" rel='stylesheet' type='text/css' />
 {{ end }}
@@ -8,39 +11,55 @@
 {{ define "Content" }}
 <section id="main-content">
   <section class="wrapper">
-    <div class="col-lg-12">
-      <div id ="lesson_table">
-        <div class="lesson_tr">
-            <div class="lesson_td"></div>
-            <div class="lesson_td">Sunday</div>
-            <div class="lesson_td">Monday</div>
-            <div class="lesson_td">Tuesday</div>
-            <div class="lesson_td">Wensday</div>
-            <div class="lesson_td">Thursday</div>
-            <div class="lesson_td">Friday</div>
-            <div class="lesson_td">Saturday</div>
+      <div class="form-w3layouts">
+          <!-- page start-->
+          <!-- page start-->
+        <div class="row">
+            
+          <div class="col-lg-12">
+              <section class="panel">
+                  <header class="panel-heading">
+                      Lesson Schedule
+                  </header>
+                  <div class="panel-body">
+                      <div class="position-center">
+                          <div id ="lesson_table">
+                              <div class="lesson_tr">
+                                  <div class="lesson_td"></div>
+                                  <div class="lesson_td">Sunday</div>
+                                  <div class="lesson_td">Monday</div>
+                                  <div class="lesson_td">Tuesday</div>
+                                  <div class="lesson_td">Wensday</div>
+                                  <div class="lesson_td">Thursday</div>
+                                  <div class="lesson_td">Friday</div>
+                                  <div class="lesson_td">Saturday</div>
+                              </div>
+                              {{range $index,$t1 := .lessons}}
+                              <div class="lesson_tr">
+                                <div class="lesson_td">{{AddNumber $index 6}}:00</div>
+                                {{range $week_index,$t2 := $t1}}
+                                  {{if eq $t2 0}}
+                                  <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}" checked></div>
+                                  {{else if eq $t2 -1}}
+                                  <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}"></div>
+                                  {{else}}
+                                  <div class="lesson_td"><i class="fa fa-check text-success text-active"></i></div>
+                                  {{end}}
+                                {{end}}
+                              </div>
+                              {{end}}
+                            </div>
+                            <label id="message" style="color: green;">
+                            </label>
+                      </div>
+                  </div>
+              </section>
+              
+          </div>
         </div>
-        {{range $index,$t1 := .lessons}}
-        <div class="lesson_tr">
-          <div class="lesson_td">{{AddNumber $index 6}}:00</div>
-          {{range $week_index,$t2 := $t1}}
-            {{if eq $t2 0}}
-            <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}" checked></div>
-            {{else if eq $t2 -1}}
-            <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}"></div>
-            {{else}}
-            <div class="lesson_td"><i class="fa fa-check text-success text-active"></i></div>
-            {{end}}
-          {{end}}
-        </div>
-        {{end}}
+        <!-- page end-->
       </div>
-      <label id="message" style="color: green;">
-
-      </label>
-      
-    </div>
-    
+          
   </section>
 </section>
 {{ end }}
