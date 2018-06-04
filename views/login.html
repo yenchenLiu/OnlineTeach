@@ -7,7 +7,7 @@
 {{ define "Content" }}
 <div class="log-w3">
 <div class="w3layouts-main">
-	<h2>Sign In Now</h2>
+	<h2>登入(Sign In Now)</h2>
 	{{ if .flash.notice }}
 	<h4 style="color:green">{{.flash.notice}}</h4>
 	{{ end }}
@@ -16,14 +16,13 @@
 	{{ end }}
 		<form action="#" method="post">
 			{{ .xsrfdata }}
-			<input type="email" class="ggg" name="Email" placeholder="E-MAIL" required="">
-			<input type="password" class="ggg" name="Password" placeholder="PASSWORD" required="">
-			<span><input type="checkbox" />Remember Me</span>
-			<h6><a href="#">Forgot Password?</a></h6>
+			<input type="email" class="ggg" name="Email" placeholder="電子郵件(E-MAIL)" required="">
+			<input type="password" class="ggg" name="Password" placeholder="密碼(PASSWORD)" required="">
+			<h6><a href="#">忘記密碼？(Forgot Password?)</a></h6>
 				<div class="clearfix"></div>
-				<input type="submit" value="Sign In" name="login">
+				<input type="submit" value="登入(Sign In)" name="login">
 		</form>
-		<p>Don't Have an Account ?<a href="signup.html">Create an account</a></p>
+		<p>還沒註冊嗎？(Don't Have an Account ?)<br><a href="signup.html">建立帳號(Create an account)</a></p>
 </div>
 </div>
 
