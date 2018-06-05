@@ -16,6 +16,7 @@ func init() {
 	beego.Router("/signup/teacher", &controllers.AuthController{}, "*:SignupTeacher")
 	beego.Router("/student/auditing", &controllers.StudentAuditingController{})
 	beego.Router("/teacher/lesson", &controllers.LessonController{})
+	beego.Router("/teacher/auditing", &controllers.TeacherAuditing{})
 	beego.Router("/admin/reviewresume", &controllers.AdminReviewResumeController{})
 	beego.Router("/admin/reviewresume/:name/:file", &controllers.AdminReviewResumeController{}, "get:Download")
 }

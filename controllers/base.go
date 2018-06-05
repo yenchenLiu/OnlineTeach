@@ -31,11 +31,13 @@ func (c *BaseController) Load() {
 			flash := beego.NewFlash()
 			flash.Warning("The user hasn't verified yet. Please check the e-mail to verify your account.")
 			flash.Store(&c.Controller)
+			c.DestroySession()
 			c.Abort("403")
 			return
 		}
 
 		user.LoadProfile()
+		c.SetSession("ProfileId", user.Profile.Id)
 		if c.GetSession("IsTeacher") == nil {
 			IsTeacher := user.Profile.Identity == "teacher"
 			c.SetSession("IsTeacher", IsTeacher)
@@ -45,14 +47,20 @@ func (c *BaseController) Load() {
 					flash := beego.NewFlash()
 					flash.Warning("The resume is under review and will be notified by email when the audit is approved.")
 					flash.Store(&c.Controller)
+					c.DestroySession()
 					c.Abort("403")
 					return
 				}
+				c.SetSession("teacher", user.Profile.Teacher.Id)
 			}
 		}
 		if c.GetSession("IsStudent") == nil {
 			IsStudent := user.Profile.Identity == "student"
 			c.SetSession("IsStudent", IsStudent)
+			user.Profile.LoadStudent()
+			if IsStudent == true {
+				c.SetSession("student", user.Profile.Student.Id)
+			}
 		}
 
 		if c.GetSession("IsAdmin") == nil {

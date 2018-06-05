@@ -12,7 +12,9 @@
 	<h4 style="color:green">{{.flash.notice}}</h4>
 	{{ end }}
 	{{ if .flash.warning }}
-	<h4 style="color:red">{{.flash.warning}}</h4>
+		<div class="alert alert-danger" role="alert">
+			<strong>Error!</strong> {{.flash.warning}}
+		</div>
 	{{ end }}
 		<form action="#" method="post">
 			{{ .xsrfdata }}

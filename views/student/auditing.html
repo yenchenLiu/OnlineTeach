@@ -31,7 +31,6 @@
                        <thead>
                          <tr>
                            <th>上課時間</th>
-                           <th>First Name</th>
                            <th>安排狀況</th>
                            <th>老師編號</th>
                            <th>老師姓名</th>
@@ -41,16 +40,17 @@
                          </tr>
                        </thead>
                        <tbody>
+                         {{range $item := .auditing}}
                          <tr data-expanded="true">
-                           <td>星期X的6:00</td>
-                           <td>Dennise</td>
-                           <td>安排中</td>
-                           <td></td>
-                           <td></td>
-                           <td></td>
-                           <td></td>
+                           <td>{{$item.Day}} {{$item.Hour}}:00</td>
+                           <td>{{$item.Status}}</td>
+                           <td>{{$item.TeacherId}}</td>
+                           <td>{{$item.TeacherName}}</td>
+                           <td>{{$item.Skype}}</td>
+                           <td>{{$item.LessonDate}}</td>
                            <td>取消申請</td>
                          </tr>
+                         {{end}}
                          
                        </tbody>
                      </table>
@@ -58,6 +58,11 @@
                    </div>
                    
                  </div>
+                 {{ if .flash.warning }}
+                    <div class="alert alert-danger" role="alert">
+                      {{.flash.warning}}
+                    </div>
+                 {{ end }}
                  <label>課程安排好後會以電子郵件通知，請注意電子郵件或回到網站上看最新安排情況。</label>
                  <div class="position-center ">
                         <div class="text-center">
@@ -80,7 +85,7 @@
                                         <div class="form-group">
                                             <label class="col-sm-3 control-label col-lg-3" for="inputSuccess">上課時間：</label>
                                             <div class="col-lg-6">
-                                                <select class="form-control m-bot15">
+                                                <select class="form-control m-bot15" name="day">
                                                     <option value="0">星期日</option>
                                                     <option value="1">星期一</option>
                                                     <option value="2">星期二</option>
@@ -91,7 +96,7 @@
                                                 </select>
                                                 <div class="form-group">
                             
-                                                        <select class="form-control m-bot15">
+                                                        <select class="form-control m-bot15" name="hour">
                                                                 <option value="6">6:00</option>
                                                                 <option value="7">7:00</option>
                                                                 <option value="8">8:00</option>

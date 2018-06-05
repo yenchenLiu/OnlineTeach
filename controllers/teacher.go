@@ -16,17 +16,15 @@ type LessonController struct {
 }
 
 func (c *LessonController) Prepare() {
-	c.EnableXSRF = false
-}
-
-func (c *LessonController) Get() {
 	if c.GetSession("IsTeacher") != true {
 		c.Abort("401")
 	}
 	c.LoadSession()
+	c.EnableXSRF = false
 
-	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+}
 
+func (c *LessonController) Get() {
 	schedules := models.LoadSchedule(c.GetSession("userinfo").(int))
 	fmt.Println(schedules)
 	var lessons [18]map[int]int
@@ -122,4 +120,78 @@ func getWeek(week int64) string {
 		return "Saturday"
 	}
 	return ""
+}
+
+type TeacherAuditing struct {
+	BaseController
+}
+
+func (this *TeacherAuditing) Prepare() {
+	if this.GetSession("IsTeacher") != true {
+		this.Abort("401")
+	}
+	this.LoadSession()
+	this.Data["xsrfdata"] = template.HTML(this.XSRFFormHTML())
+}
+
+func (this *TeacherAuditing) Get() {
+	teacher := models.Teacher{Id: this.GetSession("teacher").(int)}
+	teacher.Read("Id")
+	students := make([]int, 0)
+	var auditings []models.StudentAuditing
+	o := orm.NewOrm()
+	qs := o.QueryTable("StudentAuditing")
+
+	if _, err := qs.Filter("teacher__id", teacher.Id).All(&auditings); err != nil {
+		fmt.Println(err)
+	}
+	var teacherAuditing []map[string]string
+	for _, item := range auditings {
+		item.LoadStudent()
+		item.Student.LoadProfile()
+		teacherAuditing = append(teacherAuditing, map[string]string{
+			"StudentName": item.Student.Profile.Name, "Skype": item.Student.Profile.Skype,
+			"LessonDate": item.ArrangeDate.Format("2006-01-02"),
+			"Hour":       strconv.Itoa(item.Hour)})
+		students = append(students, item.Student.Id)
+	}
+	this.Data["teacherAuditing"] = teacherAuditing
+	var auditings_2 []models.StudentAuditing
+	qs = o.QueryTable("StudentAuditing")
+	if _, err := qs.Filter("Status", "安排中").Exclude("student__id__in", students).All(&auditings_2); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(auditings_2)
+
+	var auditing []map[string]string
+	for _, item := range auditings_2 {
+		var schedule models.LessonSchedule
+		o.QueryTable("LessonSchedule").Filter("profile__id", this.GetSession("ProfileId").(int)).Filter("Week", item.Day).One(&schedule)
+		if getField(&schedule, "H"+strconv.Itoa(item.Hour)) == 0 {
+			item.LoadStudent()
+			item.Student.LoadProfile()
+			// TODO 課程日期產生程式
+			auditing = append(auditing, map[string]string{
+				"Id":          strconv.Itoa(item.Id),
+				"StudentName": item.Student.Profile.Name, "Skype": item.Student.Profile.Skype,
+				"LessonDate": item.ArrangeDate.Format("2006-01-02"),
+				"Hour":       strconv.Itoa(item.Hour)})
+		}
+	}
+	this.Data["auditing"] = auditing
+	this.TplName = "teacher/auditing.html"
+}
+
+func (this *TeacherAuditing) Post() {
+	id, _ := strconv.ParseInt(this.Input()["AuditingId"][0], 10, 64)
+	auditing := models.StudentAuditing{Id: int(id)}
+	if auditing.Teacher == nil {
+		teacher := models.Teacher{Id: this.GetSession("teacher").(int)}
+		teacher.Read("Id")
+		auditing.Teacher = &teacher
+		auditing.Status = "預約完成"
+		auditing.Update("Teacher", "Status")
+	}
+
+	this.Get()
 }

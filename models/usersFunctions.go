@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/astaxie/beego/orm"
 )
@@ -85,6 +86,27 @@ func (p *Profile) LoadTeacher() error {
 	return nil
 }
 
+func (p *Profile) LoadStudent() error {
+	if _, err := orm.NewOrm().LoadRelated(p, "Student"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *Profile) InsertStudent() error {
+	o := orm.NewOrm()
+	var s Student
+	id, err := o.Insert(&s)
+	if err == nil {
+		fmt.Println(id)
+	}
+	p.Student = &s
+	if _, err := o.Update(p, "Student"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (d *UserData) Insert() error {
 	if _, err := orm.NewOrm().Insert(d); err != nil {
 		return err
@@ -132,6 +154,13 @@ func (m *UserData) Update(fields ...string) error {
 
 func (m *Profile) Read(fields ...string) error {
 	if err := orm.NewOrm().Read(m, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Student) LoadProfile() error {
+	if _, err := orm.NewOrm().LoadRelated(s, "Profile"); err != nil {
 		return err
 	}
 	return nil

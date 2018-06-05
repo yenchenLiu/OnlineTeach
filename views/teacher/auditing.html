@@ -1,0 +1,99 @@
+{{template "teacher/layout.html" .}}
+{{ define "Title" }}
+	Teacher|Auditing
+{{ end }}
+
+{{ define "Content" }}
+<section id="main-content">
+    <section class="wrapper">
+        <div class="table-agile-info">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                            Arranged Student Auditing
+                    </div>
+                    <div>
+                        <table class="table" ui-jq="footable" ui-options="{
+                        &quot;paging&quot;: {
+                            &quot;enabled&quot;: true
+                        },
+                        &quot;filtering&quot;: {
+                            &quot;enabled&quot;: true
+                        },
+                        &quot;sorting&quot;: {
+                            &quot;enabled&quot;: true
+                        }}">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Student Skype</th>
+                                <th>Lesson Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                
+                            {{range $item := .teacherAuditing}}
+                            <tr>
+                                <td>{{ $item.StudentName }}</td>
+                                <td>{{ $item.Skype }}</td>
+                                <td>{{ $item.LessonDate }} {{$item.Hour}}:00</td>
+                            </tr>
+                            {{end}}
+                            
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{ if .flash.warning }}
+                <div class="alert alert-danger" role="alert">
+                    {{.flash.warning}}
+                </div>
+                {{ end }}
+        </div>
+        <div class="table-agile-info">
+            <div class="panel panel-default">
+        <div class="panel-heading">
+         Student Auditing
+        </div>
+        <div>
+          <table class="table" ui-jq="footable" ui-options="{
+            &quot;paging&quot;: {
+              &quot;enabled&quot;: true
+            },
+            &quot;filtering&quot;: {
+              &quot;enabled&quot;: true
+            },
+            &quot;sorting&quot;: {
+              &quot;enabled&quot;: true
+            }}">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Lesson Time</th>
+                <th>Apply</th>
+              </tr>
+            </thead>
+            <tbody>
+            
+                    
+                {{range $item := .auditing}}
+                    <form method="POST">
+                        {{$.xsrfdata}}
+                        <tr>
+                            <input type="hidden" name="AuditingId" value="{{$item.Id}}">
+                            <td>{{ $item.StudentName }}</td>
+                            <td>{{ $item.LessonDate }} {{$item.Hour}}:00</td>
+                            <td><input type="submit" class="btn btn-success" value="Reserve"></td>
+                        </tr>
+                    </form>
+                {{ end}}
+                
+           
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+        </div>
+    </section>
+</section>
+{{ end }}

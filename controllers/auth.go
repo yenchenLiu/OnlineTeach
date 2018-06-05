@@ -103,6 +103,7 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 	userData.Type = "emailVerify"
 	userData.Data = emailVerify
 	userData.Insert()
+	p.InsertStudent()
 	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
 	return u.Id, err
 }
@@ -128,7 +129,6 @@ type AuthController struct {
 }
 
 func (c *AuthController) Get() {
-	c.Prepare()
 	if c.IsLogin {
 		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
 		return
@@ -174,7 +174,6 @@ func (c *AuthController) GetLogin() *models.User {
 }
 
 func (c *AuthController) Login() {
-	c.Prepare()
 	if c.IsLogin {
 		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
 		return
@@ -287,7 +286,7 @@ func (c *AuthController) Signup() {
 
 	flash.Success("Register user")
 	flash.Store(&c.Controller)
-
+	c.DestroySession()
 	c.SetLogin(u)
 
 	c.Redirect(c.URLFor("IndexController.Get"), 303)

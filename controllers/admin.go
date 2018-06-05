@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"WebPartice/models"
-	"fmt"
 	"html/template"
 	"strconv"
 )
@@ -11,18 +10,18 @@ type AdminReviewResumeController struct {
 	BaseController
 }
 
-func (c *AdminReviewResumeController) Get() {
+func (c *AdminReviewResumeController) Prepare() {
 	if c.GetSession("IsAdmin") != true {
 		c.Abort("401")
 	}
 	c.LoadSession()
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+}
+
+func (c *AdminReviewResumeController) Get() {
 	var teachersData []map[string]string
 
-	teachers, num, err := models.GetTeachers()
-	fmt.Print(teachers, "\n")
-	fmt.Print(num, "\n")
-	fmt.Print(err, "\n")
+	teachers, _, _ := models.GetTeachers()
 	for _, v := range teachers {
 		v.LoadProfile()
 		teachersData = append(teachersData, map[string]string{
@@ -38,10 +37,6 @@ func (c *AdminReviewResumeController) Get() {
 }
 
 func (c *AdminReviewResumeController) Post() {
-	if c.GetSession("IsAdmin") != true {
-		c.Abort("401")
-	}
-
 	for _, v := range c.Input()["Teacher[]"] {
 		id, _ := strconv.ParseInt(v, 10, 64)
 		models.VerifyResume(int(id))

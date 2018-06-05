@@ -1,10 +1,11 @@
 package models
 
 import (
+	"time"
+
 	"github.com/astaxie/beego/orm"
 )
 
-// User 使用者帳號密碼
 type LessonSchedule struct {
 	Id      int
 	Week    int      `orm:"default(1)"`
@@ -42,8 +43,20 @@ func (u *LessonSchedule) TableUnique() [][]string {
 	}
 }
 
+type StudentAuditing struct {
+	Id          int
+	Day         int
+	Hour        int
+	Status      string
+	ArrangeDate time.Time `orm:"type(date)"`
+	Created     time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated     time.Time `orm:"auto_now;type(datetime)"`
+	Student     *Student  `orm:"rel(fk)"`      // RelForeignKey relation
+	Teacher     *Teacher  `orm:"rel(fk);null"` // RelForeignKey relation
+}
+
 func init() {
 	// Need to register model in init
-	orm.RegisterModel(new(LessonSchedule))
+	orm.RegisterModel(new(LessonSchedule), new(StudentAuditing))
 
 }

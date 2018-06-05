@@ -2,9 +2,9 @@ package main
 
 import (
 	"WebPartice/controllers"
+	"WebPartice/lib"
 	"WebPartice/models"
 	_ "WebPartice/routers"
-	"WebPartice/lib"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -17,7 +17,6 @@ import (
 func init() {
 	orm.RegisterDriver("sqlite3", orm.DRSqlite)
 	orm.RegisterDataBase("default", "sqlite3", "./test.db")
-	// Error.
 	force := false
 	verbose := true
 	err := orm.RunSyncdb("default", force, verbose)
