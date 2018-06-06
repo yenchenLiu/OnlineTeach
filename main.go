@@ -1,10 +1,10 @@
 package main
 
 import (
-	"WebPartice/controllers"
-	"WebPartice/lib"
-	"WebPartice/models"
-	_ "WebPartice/routers"
+	"OnlineTeach/controllers"
+	"OnlineTeach/lib"
+	"OnlineTeach/models"
+	_ "OnlineTeach/routers"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"

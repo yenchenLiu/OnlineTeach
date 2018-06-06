@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"WebPartice/controllers"
+	"OnlineTeach/controllers"
 
 	"github.com/astaxie/beego"
 )

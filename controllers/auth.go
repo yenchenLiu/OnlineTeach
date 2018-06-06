@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"WebPartice/lib"
-	"WebPartice/models"
+	"OnlineTeach/lib"
+	"OnlineTeach/models"
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/base64"

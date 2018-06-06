@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"WebPartice/models"
+	"OnlineTeach/models"
 	"fmt"
 	"html/template"
 	"strconv"
