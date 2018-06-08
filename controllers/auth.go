@@ -178,9 +178,15 @@ func (c *AuthController) Login() {
 		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
 		return
 	}
+	flash := beego.NewFlash()
+	if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
+		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
+		flash.Warning("無法通過驗證")
+		flash.Store(&c.Controller)
+		return
+	}
 	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 	c.TplName = "login.html"
-	flash := beego.NewFlash()
 	email := c.GetString("Email")
 	password := c.GetString("Password")
 
@@ -222,9 +228,15 @@ func (c *AuthController) Signup() {
 		}
 		return
 	}
+	flash := beego.NewFlash()
+	if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
+		c.Ctx.Redirect(302, c.URLFor("IndexController.Get"))
+		flash.Warning("無法通過驗證")
+		flash.Store(&c.Controller)
+		return
+	}
 
 	var err error
-	flash := beego.NewFlash()
 
 	u := &models.User{}
 	if err = c.ParseForm(u); err != nil {

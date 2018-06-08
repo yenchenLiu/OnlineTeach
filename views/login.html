@@ -3,6 +3,14 @@
 {{ define "Title" }}
 登入
 {{ end }}
+{{ define "Head" }} 
+<script src='https://www.google.com/recaptcha/api.js'  async defer></script>
+<script>
+	function onSubmit(token) {
+		document.getElementById("form").submit();
+	}
+</script>
+{{ end }}
 
 {{ define "Content" }}
 <div class="log-w3">
@@ -16,16 +24,18 @@
 			<strong>Error!</strong> {{.flash.warning}}
 		</div>
 	{{ end }}
-		<form action="#" method="post">
+		<form id="form" action="#" method="post">
 			{{ .xsrfdata }}
 			<input type="email" class="ggg" name="Email" placeholder="電子郵件(E-MAIL)" required="">
 			<input type="password" class="ggg" name="Password" placeholder="密碼(PASSWORD)" required="">
 			<h6><a href="#">忘記密碼？(Forgot Password?)</a></h6>
 				<div class="clearfix"></div>
-				<input type="submit" value="登入(Sign In)" name="login">
+
+				<input class="g-recaptcha" data-sitekey="6LdZ8F0UAAAAAD6wZy_zBrW5niDR9s1p-ktFNnY-"
+				data-callback="onSubmit" value="登入(Sign In)" type="submit">
+				
 		</form>
 		<p>還沒註冊嗎？(Don't Have an Account ?)<br><a href="signup.html">建立帳號(Create an account)</a></p>
 </div>
 </div>
-
 {{ end }}
