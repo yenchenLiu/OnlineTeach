@@ -21,7 +21,7 @@ func ReCAPTCHAVerify(response string) bool {
 	if err := json.NewDecoder(resp.Body).Decode(&v); err != nil {
 		fmt.Println(err)
 	}
-	if v["success"] == "true" {
+	if v["success"] == true {
 		return true
 	} else {
 		return false
