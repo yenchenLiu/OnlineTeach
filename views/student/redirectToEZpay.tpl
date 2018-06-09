@@ -24,7 +24,7 @@ function post(path, params, method) {
     form.submit();
 }
 
-post('https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5',{
+post('{{.ecpayurl}}',{
     {{range $key, $value := .Post}}
     {{$key}}: '{{$value}}',
     {{end}}

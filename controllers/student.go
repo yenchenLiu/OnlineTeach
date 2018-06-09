@@ -162,6 +162,7 @@ func (c *StudentDepositController) Post() {
 	}
 	fmt.Println(post)
 	c.Data["Post"] = post
+	c.Data["ecpayurl"] = beego.AppConfig.String("ECPAYUrl")
 
 	c.TplName = "student/redirectToEZpay.tpl"
 }

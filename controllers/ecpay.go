@@ -20,8 +20,8 @@ func (this *ECPayController) Prepare() {
 }
 
 func (this *ECPayController) Post() {
-	hashKey := beego.AppConfig.String("EZPAYHashKey")
-	hashIV := beego.AppConfig.String("EZPAYHashIV")
+	hashKey := beego.AppConfig.String("ECPAYHashKey")
+	hashIV := beego.AppConfig.String("ECPAYHashIV")
 	fmt.Println("Trade No:", this.GetString(":tradeno"))
 
 	fmt.Println("Receive Data", this.Input())
