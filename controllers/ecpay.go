@@ -40,7 +40,10 @@ func (this *ECPayController) Post() {
 	m["PaymentTypeChargeFee"] = this.Input()["PaymentTypeChargeFee"][0]
 	m["TradeDate"] = this.Input()["TradeDate"][0]
 	m["SimulatePaid"] = this.Input()["SimulatePaid"][0] //Check this number is 0, it mean is true trade
-
+	m["CustomField1"] = this.Input()["CustomField1"][0]
+	m["CustomField2"] = this.Input()["CustomField2"][0]
+	m["CustomField3"] = this.Input()["CustomField3"][0]
+	m["CustomField4"] = this.Input()["CustomField4"][0]
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)
