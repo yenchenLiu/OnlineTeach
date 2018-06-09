@@ -29,15 +29,16 @@ type UserData struct {
 
 // Profile 使用者個人資料
 type Profile struct {
-	Id        int
-	Name      string
-	Identity  string
-	Points    float64 `orm:"digits(12);decimals(2);default(0.00)"`
-	Skype     string
-	User      *User             `orm:"reverse(one);on_delete(set_null)"` // Reverse relationship (optional)
-	Student   *Student          `orm:"null;rel(one)"`                    // Reverse relationship (optional)
-	Teacher   *Teacher          `orm:"null;rel(one)"`                    // Reverse relationship (optional)
-	Schedules []*LessonSchedule `orm:"reverse(many)"`                    // reverse relationship of fk
+	Id                            int
+	Name                          string
+	Identity                      string
+	Points                        float64 `orm:"digits(12);decimals(2);default(0.00)"`
+	Skype                         string
+	User                          *User                            `orm:"reverse(one);on_delete(set_null)"` // Reverse relationship (optional)
+	Student                       *Student                         `orm:"null;rel(one)"`                    // Reverse relationship (optional)
+	Teacher                       *Teacher                         `orm:"null;rel(one)"`                    // Reverse relationship (optional)
+	Schedules                     []*LessonSchedule                `orm:"reverse(many)"`                    // reverse relationship of fk
+	EZPayPaymentApplicationRecord []*EZPayPaymentApplicationRecord `orm:"reverse(many)"`                    // reverse relationship of fk
 }
 
 type Teacher struct {
@@ -46,9 +47,9 @@ type Teacher struct {
 	Proficiency      string `orm:"type(text)"`
 	Resume           string
 	IsActive         bool               `orm:"default(false)"`
-	Profile          *Profile           `orm:"reverse(one)"` // Reverse relationship (optional)
-	TeacherTags      *TeacherTags       `orm:"rel(one)"`     // OneToOne relation
-	StudentAuditings []*StudentAuditing `orm:"reverse(many)"`    // reverse relationship of fk
+	Profile          *Profile           `orm:"reverse(one)"`  // Reverse relationship (optional)
+	TeacherTags      *TeacherTags       `orm:"rel(one)"`      // OneToOne relation
+	StudentAuditings []*StudentAuditing `orm:"reverse(many)"` // reverse relationship of fk
 }
 
 type TeacherTags struct {
@@ -65,8 +66,8 @@ type Student struct {
 	Id               int
 	AduitingTimes    int                `orm:"default(0)"`
 	LeaveNumber      int                `orm:"default(0)"`
-	Profile          *Profile           `orm:"reverse(one)"` // Reverse relationship (optional)
-	StudentAuditings []*StudentAuditing `orm:"reverse(many)"`    // reverse relationship of fk
+	Profile          *Profile           `orm:"reverse(one)"`  // Reverse relationship (optional)
+	StudentAuditings []*StudentAuditing `orm:"reverse(many)"` // reverse relationship of fk
 }
 
 func init() {

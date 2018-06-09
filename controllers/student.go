@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"OnlineTeach/lib"
 	"OnlineTeach/models"
 	"fmt"
 	"html/template"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -119,4 +121,47 @@ func getWeekChinese(week int64) string {
 		return "星期六"
 	}
 	return ""
+}
+
+type StudentDepositController struct {
+	BaseController
+}
+
+func (c *StudentDepositController) Prepare() {
+	if c.GetSession("IsStudent") != true {
+		c.Abort("401")
+	}
+	c.LoadSession()
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+}
+
+func (c *StudentDepositController) Get() {
+	c.TplName = "student/deposit.html"
+}
+
+func (c *StudentDepositController) Post() {
+	money := 0
+	value := c.Input()["deposit"][0]
+	switch value {
+	case "10":
+		money = 1000
+	case "20":
+		money = 2000
+	case "40":
+		money = 4000
+	default:
+		c.Get()
+		return
+	}
+	data := strings.Split(lib.PayMoney(c.GetSession("student").(int), money), "&")
+	post := make(map[string]string)
+
+	for _, item := range data {
+		s := strings.Split(item, "=")
+		post[s[0]] = s[1]
+	}
+	fmt.Println(post)
+	c.Data["Post"] = post
+
+	c.TplName = "student/redirectToEZpay.tpl"
 }

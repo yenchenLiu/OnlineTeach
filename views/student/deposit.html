@@ -1,0 +1,95 @@
+{{template "student/layout.html" .}}
+
+
+{{ define "Title" }}
+	學生|儲值學習點數
+{{ end }}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<!--main content start-->
+<section id="main-content">
+    <section class="wrapper">
+        <div class="form-w3layouts">
+            <!-- page start-->
+            <!-- page start-->
+            <div class="row">
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                                <div class="panel-heading">
+                                 基本資料
+                                </div>
+                                <div>
+                                  <table class="table" ui-jq="footable" ui-options="{
+                                    &quot;paging&quot;: {
+                                      &quot;enabled&quot;: true
+                                    },
+                                    &quot;filtering&quot;: {
+                                      &quot;enabled&quot;: true
+                                    },
+                                    &quot;sorting&quot;: {
+                                      &quot;enabled&quot;: true
+                                    }}">
+                                    <tbody>
+                                      <tr>
+                                        <td>學生姓名</td>
+                                        <td>Dennise</td>
+                                      </tr>
+                                      <tr>
+                                        <td>剩餘上課點數</td>
+                                        <td>Dennise</td>
+                                      </tr>
+                                      
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                        <section class="panel">
+                            <header class="panel-heading">
+                                課程儲值
+                            </header>
+                            <div class="panel-body">
+                                <div class="position-center">
+                                <form class="form-horizontal bucket-form" method="post">
+                                    {{.xsrfdata}}
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label col-lg-3">儲值</label>
+                                            <div class="col-lg-6">
+                                                <select class="form-control input-lg m-bot15" name="deposit">
+                                                    <option value="10">10點(1000元)</option>
+                                                    <option value="20">20點(2000元)</option>
+                                                    <option value="40">40點(4000元)</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-info">送出申請</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                        </section>
+                        <span>
+                            <p>1.每堂課程(約50-55分鐘)需要2點。(教學時間長以及評價高的老師，可以有限度的調高所需要點數)</p>
+                            <p>2.付款完成後點數會自動匯入至帳號。</p>
+                        </span>
+                </div>
+                
+            </div>
+         
+    
+    
+            <!-- page end-->
+            </div>
+    </section>
+     <!-- footer -->
+              <div class="footer">
+                <div class="wthree-copyright">
+                  <p>© 2018 English. All rights reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p>
+                </div>
+              </div>
+      <!-- / footer -->
+    </section>
+{{ end }}
