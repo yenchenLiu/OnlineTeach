@@ -22,15 +22,12 @@ func (this *ECPayController) Prepare() {
 func (this *ECPayController) Post() {
 	hashKey := beego.AppConfig.String("ECPAYHashKey")
 	hashIV := beego.AppConfig.String("ECPAYHashIV")
-	fmt.Println("Trade No:", this.GetString(":tradeno"))
-
 	fmt.Println("Receive Data", this.Input())
 
 	m := make(map[string]string)
 	m["MerchantID"] = this.Input()["MerchantID"][0]
-	m["PlatformID"] = this.Input()["PlatformID"][0]
 	m["MerchantTradeNo"] = this.Input()["MerchantTradeNo"][0]
-	m["StoreID"] = this.Input()["StoreID"][0]
+	m["StoreID"] = ""
 	m["RtnCode"] = this.Input()["RtnCode"][0] //Check this number is 1, it mean is success
 	m["RtnMsg"] = this.Input()["RtnMsg"][0]
 	m["TradeNo"] = this.Input()["TradeNo"][0]
@@ -40,10 +37,10 @@ func (this *ECPayController) Post() {
 	m["PaymentTypeChargeFee"] = this.Input()["PaymentTypeChargeFee"][0]
 	m["TradeDate"] = this.Input()["TradeDate"][0]
 	m["SimulatePaid"] = this.Input()["SimulatePaid"][0] //Check this number is 0, it mean is true trade
-	m["CustomField1"] = this.Input()["CustomField1"][0]
-	m["CustomField2"] = this.Input()["CustomField2"][0]
-	m["CustomField3"] = this.Input()["CustomField3"][0]
-	m["CustomField4"] = this.Input()["CustomField4"][0]
+	m["CustomField1"] = ""
+	m["CustomField2"] = ""
+	m["CustomField3"] = ""
+	m["CustomField4"] = ""
 	var keys []string
 	for k := range m {
 		keys = append(keys, k)
