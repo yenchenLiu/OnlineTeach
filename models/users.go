@@ -39,6 +39,7 @@ type Profile struct {
 	Teacher                       *Teacher                         `orm:"null;rel(one)"`                    // Reverse relationship (optional)
 	Schedules                     []*LessonSchedule                `orm:"reverse(many)"`                    // reverse relationship of fk
 	EZPayPaymentApplicationRecord []*EZPayPaymentApplicationRecord `orm:"reverse(many)"`                    // reverse relationship of fk
+	PointsTrade                   []*PointsTrade                   `orm:"reverse(many)"`
 }
 
 type Teacher struct {
