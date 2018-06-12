@@ -82,11 +82,9 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         </div>
         
         <div class="top-nav clearfix">
-            <!--search & user info start-->
+            <!--user info start-->
             <ul class="nav pull-right top-menu">
-                <li>
-                    <input type="text" class="form-control search" placeholder="搜尋">
-                </li>
+                
                 <!-- user login dropdown start-->
                 <li class="dropdown">
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
@@ -101,7 +99,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                 <!-- user login dropdown end -->
                
             </ul>
-            <!--search & user info end-->
+            <!--user info end-->
         </div>
         {{ end }}
         </header>
@@ -128,8 +126,26 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     </li>
                     <li>
                         <a {{if eq .Uri "/student/deposit"}} class="active" {{end}} href="/student/deposit">
-                            <i class="glyphicon glyphicon-th-list"></i>
+                            <i class="fa fa-money"></i>
                             <span>課程儲值</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a {{if eq .Uri "/student/new/lesson"}} class="active" {{end}} href="/student/new/lesson">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            <span>新增課程</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a {{if eq .Uri "/student/new/lesson"}} class="active" {{end}} href="/student/new/lesson">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            <span>課程總覽</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a {{if eq .Uri "/student/new/lesson"}} class="active" {{end}} href="/student/new/lesson">
+                            <i class="fa fa-file-text"></i>
+                            <span>意見回饋</span>
                         </a>
                     </li>
                 </ul>            

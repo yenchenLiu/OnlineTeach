@@ -16,6 +16,7 @@ func init() {
 	beego.Router("/signup/teacher", &controllers.AuthController{}, "*:SignupTeacher")
 	beego.Router("/student/auditing", &controllers.StudentAuditingController{})
 	beego.Router("/student/deposit", &controllers.StudentDepositController{})
+	beego.Router("/student/new/lesson", &controllers.NewLessonController{})
 	beego.Router("/teacher/lesson", &controllers.LessonController{})
 	beego.Router("/teacher/auditing", &controllers.TeacherAuditing{})
 	beego.Router("/admin/reviewresume", &controllers.AdminReviewResumeController{})

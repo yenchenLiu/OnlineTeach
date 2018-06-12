@@ -28,6 +28,7 @@ func PayMoney(Id int, money int) string {
 	m["TradeDesc"] = "線上英文家教平台"
 	m["ItemName"] = "線上英文家教平台" + strconv.Itoa(money/100) + "點"
 	m["ReturnURL"] = "https://www.onlineteach.asia/ecpay/receive"
+	m["ClientBackURL"] = "https://www.onlineteach.asia/student/deposit"
 	m["ChoosePayment"] = "ALL"
 	m["EncryptType"] = "1"
 

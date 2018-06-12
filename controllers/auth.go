@@ -75,7 +75,14 @@ func SignupTeacher(u *models.User, p *models.Profile, t *models.Teacher, tg *mod
 	userData.Data = emailVerify
 	userData.Insert()
 
-	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
+	if beego.AppConfig.String("runmode") == "dev" {
+		u.IsActive = true
+		u.Update("IsActive")
+		t.IsActive = true
+		t.Update("IsActive")
+	} else {
+		lib.SendVerifyMail(u.Email, emailVerify)
+	}
 	return u.Id, err
 }
 
@@ -104,7 +111,13 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 	userData.Data = emailVerify
 	userData.Insert()
 	p.InsertStudent()
-	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
+
+	if beego.AppConfig.String("runmode") == "dev" {
+		u.IsActive = true
+		u.Update("IsActive")
+	} else {
+		lib.SendVerifyMail(u.Email, emailVerify)
+	}
 	return u.Id, err
 }
 

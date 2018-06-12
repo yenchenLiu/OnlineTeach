@@ -123,25 +123,29 @@ func getWeekChinese(week int64) string {
 	return ""
 }
 
+// StudentDepositController 學生儲值
 type StudentDepositController struct {
 	BaseController
 }
 
-func (c *StudentDepositController) Prepare() {
-	if c.GetSession("IsStudent") != true {
-		c.Abort("401")
+func (s *StudentDepositController) Prepare() {
+	if s.GetSession("IsStudent") != true {
+		s.Abort("401")
 	}
-	c.LoadSession()
-	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
+	s.LoadSession()
+	s.Data["xsrfdata"] = template.HTML(s.XSRFFormHTML())
 }
 
-func (c *StudentDepositController) Get() {
-	c.TplName = "student/deposit.html"
+func (s *StudentDepositController) Get() {
+	profile := models.Profile{Id: s.GetSession("ProfileId").(int)}
+
+	s.Data["Points"] = strconv.FormatFloat(profile.Points, 'f', 1, 64)
+	s.TplName = "student/deposit.html"
 }
 
-func (c *StudentDepositController) Post() {
+func (s *StudentDepositController) Post() {
 	money := 0
-	value := c.Input()["deposit"][0]
+	value := s.Input()["deposit"][0]
 	switch value {
 	case "10":
 		money = 1000
@@ -150,10 +154,10 @@ func (c *StudentDepositController) Post() {
 	case "40":
 		money = 4000
 	default:
-		c.Get()
+		s.Get()
 		return
 	}
-	data := strings.Split(lib.PayMoney(c.GetSession("student").(int), money), "&")
+	data := strings.Split(lib.PayMoney(s.GetSession("student").(int), money), "&")
 	post := make(map[string]string)
 
 	for _, item := range data {
@@ -161,8 +165,24 @@ func (c *StudentDepositController) Post() {
 		post[s[0]] = s[1]
 	}
 	fmt.Println(post)
-	c.Data["Post"] = post
-	c.Data["ecpayurl"] = beego.AppConfig.String("ECPAYUrl")
+	s.Data["Post"] = post
+	s.Data["ecpayurl"] = beego.AppConfig.String("ECPAYUrl")
 
-	c.TplName = "student/redirectToEZpay.tpl"
+	s.TplName = "student/redirectToEZpay.tpl"
+}
+
+type NewLessonController struct {
+	BaseController
+}
+
+func (n *NewLessonController) Prepare() {
+	if n.GetSession("IsStudent") != true {
+		n.Abort("401")
+	}
+	n.LoadSession()
+	n.Data["xsrfdata"] = template.HTML(n.XSRFFormHTML())
+}
+
+func (n *NewLessonController) Get() {
+	n.TplName = "student/newLesson.html"
 }
