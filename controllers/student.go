@@ -184,5 +184,71 @@ func (n *NewLessonController) Prepare() {
 }
 
 func (n *NewLessonController) Get() {
+	var teachersData []map[string]string
+
+	teachers, _, _ := models.GetTeachers()
+	for _, v := range teachers {
+		v.LoadProfile()
+		if v.IsActive == true {
+			teachersData = append(teachersData, map[string]string{
+				"Id":             strconv.Itoa(v.Id),
+				"Name":           v.Profile.Name,
+				"Rating":         strconv.FormatFloat(v.AverageRating, 'f', 1, 64),
+				"TotalClassHour": strconv.FormatFloat(v.TotalClassHour, 'f', 1, 64)})
+		}
+	}
+
+	n.Data["teachers"] = teachersData
 	n.TplName = "student/newLesson.html"
+}
+
+type TeacherInformation struct {
+	BaseController
+}
+
+func (t *TeacherInformation) Prepare() {
+	if t.GetSession("IsStudent") != true {
+		t.Abort("401")
+	}
+	t.LoadSession()
+	t.Data["xsrfdata"] = template.HTML(t.XSRFFormHTML())
+}
+
+func (t *TeacherInformation) Get() {
+	Id, _ := strconv.ParseInt(t.GetString(":Id"), 10, 64)
+	teacher := models.Teacher{Id: int(Id)}
+	if err := teacher.Read("Id"); err != nil {
+		t.Abort("404")
+	}
+	teacher.LoadProfile()
+
+	schedules := models.LoadSchedule(teacher.Profile.Id)
+	var lessons [18]map[int]int
+	for index := 0; index < 18; index++ {
+		lessons[index] = make(map[int]int)
+	}
+	// 6-23
+	for index, schedule := range schedules {
+		lessons[0][index] = schedule.H6
+		lessons[1][index] = schedule.H7
+		lessons[2][index] = schedule.H8
+		lessons[3][index] = schedule.H9
+		lessons[4][index] = schedule.H10
+		lessons[5][index] = schedule.H11
+		lessons[6][index] = schedule.H12
+		lessons[7][index] = schedule.H13
+		lessons[8][index] = schedule.H14
+		lessons[9][index] = schedule.H15
+		lessons[10][index] = schedule.H16
+		lessons[11][index] = schedule.H17
+		lessons[12][index] = schedule.H18
+		lessons[13][index] = schedule.H19
+		lessons[14][index] = schedule.H20
+		lessons[15][index] = schedule.H21
+		lessons[16][index] = schedule.H22
+		lessons[17][index] = schedule.H23
+	}
+	t.Data["lessons"] = lessons
+
+	t.TplName = "student/teacherInformation.html"
 }

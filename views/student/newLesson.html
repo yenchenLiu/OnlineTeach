@@ -40,19 +40,21 @@
                          </tr>
                        </thead>
                        <tbody>
+                          {{ range $data := .teachers}}
                          <tr>
-                           <td></td>
-                           <td></td>
-                           <td>/5</td>
-                           <td></td>
+                           <td>{{$data.Id}}</td>
+                           <td>{{$data.Name}}</td>
+                           <td>{{$data.Rating}}/5</td>
+                           <td>{{$data.TotalClassHour}} 小時</td>
                            <td>
                               <div>
-                                  <a href="#" class="btn btn-success">
+                                  <a href="/student/teacherInformation/{{$data.Id}}" class="btn btn-success">
                                     介紹
                                   </a>
                               </div>
                            </td>
                          </tr>
+                         {{ end }}
                        </tbody>
                      </table>
                      

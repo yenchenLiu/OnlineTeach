@@ -45,6 +45,7 @@
                             <th>Name</th>
                             <th>Teaching experience</th>
                             <th>Proficiency</th>
+                            <th>Youtube</th>
                             <th>Resume</th>
                             <th style="width:30px;">IsActive</th>
                             </tr>
@@ -56,6 +57,7 @@
                                         <td>{{$data.Name}}</td>
                                         <td>{{$data.Teaching}}</td>
                                         <td>{{$data.Proficiency}}</td>
+                                        <td><a href="{{$data.Youtube}}">youtube</a></td>
                                         <td><a href="./reviewresume/{{$data.Name}}/{{$data.Resume}}" target="_blank">Download</a></td>
                                         <td>
                                             {{ if eq $data.IsActive "true"}}

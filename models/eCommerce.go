@@ -38,8 +38,8 @@ type EZPayPaymentReceiveRecord struct {
 
 type PointsTrade struct {
 	Id                   int
-	Points               float64 `orm:"digits(12);decimals(2);default(0.00)"`
-	Description          string
+	Points               float64                    `orm:"digits(12);decimals(2);default(0.00)"`
+	Description          string                     `orm:"type(text)"`
 	PaymentReceiveRecord *EZPayPaymentReceiveRecord `orm:"reverse(one);null"` // Reverse relationship (optional)
 	ProfileReceiver      *Profile                   `orm:"rel(fk);null"`      // RelForeignKey relation
 	ProfileGiver         *Profile                   `orm:"rel(fk);null"`      // RelForeignKey relation

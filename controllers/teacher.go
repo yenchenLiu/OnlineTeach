@@ -25,7 +25,7 @@ func (c *LessonController) Prepare() {
 }
 
 func (c *LessonController) Get() {
-	schedules := models.LoadSchedule(c.GetSession("userinfo").(int))
+	schedules := models.LoadSchedule(c.GetSession("ProfileId").(int))
 	fmt.Println(schedules)
 	var lessons [18]map[int]int
 	for index := 0; index < 18; index++ {
@@ -69,7 +69,7 @@ func (c *LessonController) Post() {
 	week, _ := strconv.ParseInt(value[0], 10, 64)
 	// hour, _ := strconv.ParseInt(value[1], 10, 64)
 	o := orm.NewOrm()
-	if err := o.QueryTable("LessonSchedule").Filter("Profile", c.GetSession("userinfo").(int)).Filter("Week", week).One(&schedule); err != nil {
+	if err := o.QueryTable("LessonSchedule").Filter("Profile", c.GetSession("ProfileId").(int)).Filter("Week", week).One(&schedule); err != nil {
 		c.Redirect(c.URLFor("LessonController.Get"), 302)
 	}
 

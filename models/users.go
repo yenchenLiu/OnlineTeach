@@ -47,10 +47,14 @@ type Teacher struct {
 	TeachingYears    int
 	Proficiency      string `orm:"type(text)"`
 	Resume           string
+	Youtube          string
+	AverageRating    float64            `orm:"digits(2);decimals(1);default(0.0)"`
+	TotalClassHour   float64            `orm:"digits(2);decimals(1);default(0.0)"`
 	IsActive         bool               `orm:"default(false)"`
 	Profile          *Profile           `orm:"reverse(one)"`  // Reverse relationship (optional)
 	TeacherTags      *TeacherTags       `orm:"rel(one)"`      // OneToOne relation
 	StudentAuditings []*StudentAuditing `orm:"reverse(many)"` // reverse relationship of fk
+	RatingRecords    []*RatingRecords   `orm:"reverse(many)"`
 }
 
 type TeacherTags struct {
@@ -69,6 +73,7 @@ type Student struct {
 	LeaveNumber      int                `orm:"default(0)"`
 	Profile          *Profile           `orm:"reverse(one)"`  // Reverse relationship (optional)
 	StudentAuditings []*StudentAuditing `orm:"reverse(many)"` // reverse relationship of fk
+	RatingRecords    []*RatingRecords   `orm:"reverse(many)"`
 }
 
 func init() {

@@ -80,6 +80,7 @@ func SignupTeacher(u *models.User, p *models.Profile, t *models.Teacher, tg *mod
 		u.Update("IsActive")
 		t.IsActive = true
 		t.Update("IsActive")
+		models.CreateLessonSchedule(p)
 	} else {
 		lib.SendVerifyMail(u.Email, emailVerify)
 	}
@@ -115,6 +116,7 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 	if beego.AppConfig.String("runmode") == "dev" {
 		u.IsActive = true
 		u.Update("IsActive")
+		models.CreateLessonSchedule(p)
 	} else {
 		lib.SendVerifyMail(u.Email, emailVerify)
 	}
@@ -192,8 +194,12 @@ func (c *AuthController) Login() {
 		return
 	}
 	flash := beego.NewFlash()
-
-	if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
+	if len(c.Input()["g-recaptcha-response"]) == 0 {
+		flash.Warning("無法通過驗證")
+		flash.Store(&c.Controller)
+		c.Get()
+		return
+	} else if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
 		flash.Warning("無法通過驗證")
 		flash.Store(&c.Controller)
 		c.Get()

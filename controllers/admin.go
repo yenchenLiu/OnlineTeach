@@ -29,6 +29,7 @@ func (c *AdminReviewResumeController) Get() {
 			"Name":        v.Profile.Name,
 			"Teaching":    strconv.Itoa(v.TeachingYears),
 			"Proficiency": v.Proficiency, "Resume": v.Resume,
+			"Youtube":  v.Youtube,
 			"IsActive": strconv.FormatBool(v.IsActive)})
 	}
 
