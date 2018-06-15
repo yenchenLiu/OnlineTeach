@@ -140,8 +140,9 @@ func (this *TeacherAuditing) Get() {
 	students := make([]int, 0)
 	var auditings []models.StudentAuditing
 	o := orm.NewOrm()
-	qs := o.QueryTable("StudentAuditing")
 
+	// 找出老師所有教的學生
+	qs := o.QueryTable("StudentAuditing")
 	if _, err := qs.Filter("teacher__id", teacher.Id).All(&auditings); err != nil {
 		fmt.Println(err)
 	}
@@ -149,6 +150,7 @@ func (this *TeacherAuditing) Get() {
 	for _, item := range auditings {
 		item.LoadStudent()
 		item.Student.LoadProfile()
+		fmt.Println(item.Student.Id)
 		teacherAuditing = append(teacherAuditing, map[string]string{
 			"StudentName": item.Student.Profile.Name, "Skype": item.Student.Profile.Skype,
 			"LessonDate": item.ArrangeDate.Format("2006-01-02"),
@@ -158,10 +160,16 @@ func (this *TeacherAuditing) Get() {
 	this.Data["teacherAuditing"] = teacherAuditing
 	var auditings_2 []models.StudentAuditing
 	qs = o.QueryTable("StudentAuditing")
-	if _, err := qs.Filter("Status", "安排中").Exclude("student__id__in", students).All(&auditings_2); err != nil {
-		fmt.Println(err)
+	// 如果老師教的學生數不等於0
+	if len(students) != 0 {
+		if _, err := qs.Filter("Status", "安排中").Exclude("student__id__in", students).All(&auditings_2); err != nil {
+			fmt.Println(err)
+		}
+	} else {
+		if _, err := qs.Filter("Status", "安排中").All(&auditings_2); err != nil {
+			fmt.Println(err)
+		}
 	}
-	fmt.Println(auditings_2)
 
 	var auditing []map[string]string
 	for _, item := range auditings_2 {
@@ -179,6 +187,7 @@ func (this *TeacherAuditing) Get() {
 		}
 	}
 	this.Data["auditing"] = auditing
+
 	this.TplName = "teacher/auditing.html"
 }
 
