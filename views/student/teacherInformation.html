@@ -20,7 +20,9 @@
                     </header>
                     <div class="gallery-grid">
                         <div class="">
-                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/yuJfl5XDIVY?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            {{ if .teacherData.Youtube}}
+                            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/{{.teacherData.Youtube}}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            {{end}}
                         </div>
                     </div>
                     <hr>
@@ -39,14 +41,18 @@
                                       <tbody>
                                         <tr>
                                           <td>老師姓名：</td>
-                                          <td>Dennise</td>
+                                          <td>{{.teacherData.Name}}</td>
                                         </tr>
                                         <tr>
                                             <td>綜合評分：</td>
-                                            <td></td>
+                                            <td>{{.teacherData.AverageRating}}</td>
                                         </tr>
                                         <tr>
                                             <td>平台上課時數：</td>
+                                            <td>{{.teacherData.TotalClassHour}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>老師自傳：</td>
                                             <td></td>
                                         </tr>
                                       </tbody>
@@ -63,6 +69,8 @@
                             <div class="panel-body">
                                 <div class="position-center">
                                     <div id ="lesson_table">
+                                        <form method="POST">
+                                            {{.xsrfdata}}
                                         <div class="lesson_tr">
                                             <div class="lesson_td"></div>
                                             <div class="lesson_td">Sunday</div>
@@ -73,23 +81,25 @@
                                             <div class="lesson_td">Friday</div>
                                             <div class="lesson_td">Saturday</div>
                                         </div>
+                                        
+                                            
                                         {{range $index,$t1 := .lessons}}
                                         <div class="lesson_tr">
                                           <div class="lesson_td">{{AddNumber $index 6}}:00</div>
                                           {{range $week_index,$t2 := $t1}}
                                             {{if eq $t2 0}}
-                                            <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}" checked></div>
-                                            {{else if eq $t2 -1}}
-                                            <div class="lesson_td"><input class="lesson_checkbox" type="checkbox" name="schedule[]" value="{{$week_index}}_{{AddNumber $index 6}}"></div>
+                                            <div class="lesson_td"><button class="" type="submit" name="addLesson" value="{{$week_index}}_{{AddNumber $index 6}}">加選</button></div>
                                             {{else}}
-                                            <div class="lesson_td"><i class="fa fa-check text-success text-active"></i></div>
+                                            <div class="lesson_td"></div>
                                             {{end}}
                                           {{end}}
                                         </div>
                                         {{end}}
-                                      </div>
+                                        </form>
+                                    </div>
                                       <label id="message" style="color: green;">
                                       </label>
+                                    
                                 </div>
                             </div>
                         </section>

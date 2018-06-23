@@ -350,8 +350,8 @@ func (c *AuthController) SignupTeacher() {
 	user := new(models.User)
 	profile := new(models.Profile)
 	tg := new(models.TeacherTags)
-	t := &models.Teacher{}
-	if err = c.ParseForm(t); err != nil {
+	teacher := &models.Teacher{}
+	if err = c.ParseForm(teacher); err != nil {
 		flash.Error("Signup invalid!")
 		flash.Store(&c.Controller)
 		return
@@ -380,14 +380,14 @@ func (c *AuthController) SignupTeacher() {
 	b := []byte(register["Email"][0])
 	has := md5.Sum(b)
 	filename := hex.EncodeToString(has[:])
-	t.Resume = filename + ".pdf"
+	teacher.Resume = filename + ".pdf"
 	if err := c.SaveToFile("ResumeFile", "./resumes/"+filename+".pdf"); err != nil {
 		flash.Warning(err.Error())
 		flash.Store(&c.Controller)
 		return
 	}
-
-	id, err := SignupTeacher(user, profile, t, tg)
+	teacher.ClassValue = 2
+	id, err := SignupTeacher(user, profile, teacher, tg)
 	if err != nil || id < 1 {
 		flash.Warning(err.Error())
 		flash.Store(&c.Controller)

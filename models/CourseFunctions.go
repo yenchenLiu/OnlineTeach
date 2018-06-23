@@ -4,27 +4,34 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
-func (l *LessonSchedule) Read(fields ...string) error {
+func (l *CourseSchedule) Read(fields ...string) error {
 	if err := orm.NewOrm().Read(l, fields...); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (l *LessonSchedule) Update(fields ...string) error {
+func (l *CourseSchedule) Update(fields ...string) error {
 	if _, err := orm.NewOrm().Update(l, fields...); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (l *LessonSchedule) Insert() error {
+func (l *CourseSchedule) Insert() error {
 	if _, err := orm.NewOrm().Insert(l); err != nil {
 		return err
 	}
 	return nil
 }
 
+
+func (c *CourseRegistration) Insert() error {
+	if _, err := orm.NewOrm().Insert(c); err != nil {
+		return err
+	}
+	return nil
+}
 
 func (s *StudentAuditing) Read(fields ...string) error {
 	if err := orm.NewOrm().Read(s, fields...); err != nil {
@@ -61,10 +68,10 @@ func (a *StudentAuditing) Insert() error {
 	return nil
 }
 
-func LoadSchedule(Id int) []LessonSchedule {
-	var schedules []LessonSchedule
+func LoadSchedule(Id int) []CourseSchedule {
+	var schedules []CourseSchedule
 	o := orm.NewOrm()
-	qs := o.QueryTable("LessonSchedule")
+	qs := o.QueryTable("CourseSchedule")
 	qs.Filter("Profile", Id).All(&schedules)
 	return schedules
 }

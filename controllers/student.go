@@ -5,6 +5,7 @@ import (
 	"OnlineTeach/models"
 	"fmt"
 	"html/template"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -248,7 +249,84 @@ func (t *TeacherInformation) Get() {
 		lessons[16][index] = schedule.H22
 		lessons[17][index] = schedule.H23
 	}
-	t.Data["lessons"] = lessons
+	teacherData := make(map[string]string)
+	youtubeUrl, err := url.Parse(teacher.Youtube)
+	if err != nil {
+		teacherData["Youtube"] = ""
+	} else {
+		if len(youtubeUrl.Query()["v"]) == 1 {
+			teacherData["Youtube"] = youtubeUrl.Query()["v"][0]
+		}
+	}
+	teacherData["Name"] = teacher.Profile.Name
+	teacherData["AverageRating"] = strconv.FormatFloat(teacher.AverageRating, 'f', 1, 64)
+	teacherData["TotalClassHour"] = strconv.FormatFloat(teacher.TotalClassHour, 'f', 1, 64)
 
+	t.Data["lessons"] = lessons
+	t.Data["teacherData"] = teacherData
 	t.TplName = "student/teacherInformation.html"
+}
+
+func (t *TeacherInformation) Post() {
+	Id, _ := strconv.ParseInt(t.GetString(":Id"), 10, 64)
+	teacher := models.Teacher{Id: int(Id)}
+	if err := teacher.Read("Id"); err != nil {
+		t.Abort("404")
+	}
+	teacher.LoadProfile()
+	profile := models.Profile{Id: t.GetSession("ProfileId").(int)}
+	profile.LoadStudent()
+	student := profile.Student
+	value := strings.Split(t.Input()["addLesson"][0], "_")
+	var schedule models.CourseSchedule
+	week, _ := strconv.ParseInt(value[0], 10, 64)
+	hour, _ := strconv.ParseInt(value[1], 10, 64)
+	flash := beego.NewFlash()
+
+	o := orm.NewOrm()
+
+	// 檢查與更改學生課表
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", t.GetSession("ProfileId").(int)).Filter("Week", week).One(&schedule); err != nil {
+		t.Redirect(t.URLFor("TeacherInformation.Get"), 302)
+	}
+
+	switch getField(&schedule, "H"+value[1]) {
+	case -1: // 成功選取
+		courseRegistration := new(models.CourseRegistration)
+		courseRegistration.ClassWeek = int8(week)
+		courseRegistration.ClassHour = int8(hour)
+		courseRegistration.Points = teacher.ClassValue
+		courseRegistration.Student = student
+		courseRegistration.Teacher = &teacher
+		courseRegistration.Insert()
+
+		setField(&schedule, "H"+value[1], courseRegistration.Id)
+		schedule.Update("H" + value[1])
+
+		var scheduleTeacher models.CourseSchedule
+		// 更改老師課表
+		if err := o.QueryTable("CourseSchedule").Filter("Profile", teacher.Profile.Id).Filter("Week", week).One(&scheduleTeacher); err != nil {
+			t.Redirect(t.URLFor("TeacherInformation.Get"), 302)
+		}
+		switch getField(&scheduleTeacher, "H"+value[1]) {
+		case 0:
+			setField(&scheduleTeacher, "H"+value[1], courseRegistration.Id)
+			scheduleTeacher.Update("H" + value[1])
+		default: // 非法操作
+			flash.Warning("此時段已安排其他課程")
+			flash.Store(&t.Controller)
+			t.Get()
+			return
+		}
+
+	default: // 已有課程 return error
+		flash.Warning("此時段已安排其他課程")
+		flash.Store(&t.Controller)
+		t.Get()
+		return
+	}
+
+	flash.Success("選課成功，以下為選課老師資訊")
+	flash.Store(&t.Controller)
+	t.Get()
 }

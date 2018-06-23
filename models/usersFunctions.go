@@ -141,9 +141,9 @@ func VerifyEmail(emailData string) error {
 
 func CreateLessonSchedule(profile *Profile) {
 	o := orm.NewOrm()
-	lessons := []LessonSchedule{}
+	lessons := []CourseSchedule{}
 	for index := 0; index < 7; index++ {
-		lessons = append(lessons, LessonSchedule{Week: index, Profile: profile,
+		lessons = append(lessons, CourseSchedule{Week: index, Profile: profile,
 			H0: -1, H1: -1, H2: -1, H3: -1, H4: -1, H5: -1, H6: -1, H7: -1, H8: -1, H9: -1, H10: -1,
 			H11: -1, H12: -1, H13: -1, H14: -1, H15: -1, H16: -1, H17: -1, H18: -1, H19: -1, H20: -1,
 			H21: -1, H22: -1, H23: -1})

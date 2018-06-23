@@ -63,13 +63,13 @@ type jsonResponse struct {
 func (c *LessonController) Post() {
 	value := strings.Split(c.Input()["lesson_checkbox"][0], "_")
 
-	var schedule models.LessonSchedule
+	var schedule models.CourseSchedule
 	var responseData string
 
 	week, _ := strconv.ParseInt(value[0], 10, 64)
 	// hour, _ := strconv.ParseInt(value[1], 10, 64)
 	o := orm.NewOrm()
-	if err := o.QueryTable("LessonSchedule").Filter("Profile", c.GetSession("ProfileId").(int)).Filter("Week", week).One(&schedule); err != nil {
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", c.GetSession("ProfileId").(int)).Filter("Week", week).One(&schedule); err != nil {
 		c.Redirect(c.URLFor("LessonController.Get"), 302)
 	}
 
@@ -88,7 +88,7 @@ func (c *LessonController) Post() {
 	c.ServeJSON()
 }
 
-func getField(v *models.LessonSchedule, field string) int {
+func getField(v *models.CourseSchedule, field string) int {
 	r := reflect.ValueOf(v)
 	fmt.Println(r)
 	f := reflect.Indirect(r).FieldByName(field)
@@ -96,7 +96,7 @@ func getField(v *models.LessonSchedule, field string) int {
 	return int(f.Int())
 }
 
-func setField(v *models.LessonSchedule, field string, data int) {
+func setField(v *models.CourseSchedule, field string, data int) {
 	r := reflect.ValueOf(v)
 	fmt.Println(r)
 	reflect.Indirect(r).FieldByName(field).SetInt(int64(data))
@@ -173,8 +173,8 @@ func (this *TeacherAuditing) Get() {
 
 	var auditing []map[string]string
 	for _, item := range auditings_2 {
-		var schedule models.LessonSchedule
-		o.QueryTable("LessonSchedule").Filter("profile__id", this.GetSession("ProfileId").(int)).Filter("Week", item.Day).One(&schedule)
+		var schedule models.CourseSchedule
+		o.QueryTable("CourseSchedule").Filter("profile__id", this.GetSession("ProfileId").(int)).Filter("Week", item.Day).One(&schedule)
 		if getField(&schedule, "H"+strconv.Itoa(item.Hour)) == 0 {
 			item.LoadStudent()
 			item.Student.LoadProfile()
