@@ -297,6 +297,7 @@ func (t *TeacherInformation) Post() {
 		courseRegistration.ClassHour = int8(hour)
 		courseRegistration.Points = teacher.ClassValue
 		courseRegistration.Student = student
+		courseRegistration.IsActive = true
 		courseRegistration.Teacher = &teacher
 		courseRegistration.Insert()
 
@@ -326,7 +327,44 @@ func (t *TeacherInformation) Post() {
 		return
 	}
 
+	// TODO 產生課程單
+
 	flash.Success("選課成功，以下為選課老師資訊")
 	flash.Store(&t.Controller)
-	t.Get()
+	t.Redirect(t.URLFor("CourseList.Get"), 302)
+}
+
+type CourseList struct {
+	BaseController
+}
+
+func (c *CourseList) Prepare() {
+	if c.GetSession("IsStudent") != true {
+		c.Abort("401")
+	}
+	c.LoadSession()
+}
+
+func (c *CourseList) Get() {
+	student := models.Student{Id: c.GetSession("student").(int)}
+	student.Read("Id")
+	courses, num, _ := models.GetCourseRegistrationFromStudent(&student)
+	if num == 0 {
+		// TODO 沒有選課時，顯示教學畫面
+	} else {
+		var courseDatas []map[string]string
+		for _, course := range courses {
+			course.LoadTeacher()
+			course.Teacher.LoadProfile()
+			courseDatas = append(courseDatas, map[string]string{
+				"ID":           strconv.Itoa(course.Id),
+				"Point":        strconv.FormatFloat(course.Points, 'f', 2, 64),
+				"teacherID":    strconv.Itoa(course.Teacher.Id),
+				"teacherName":  course.Teacher.Profile.Name,
+				"teacherSkype": course.Teacher.Profile.Skype})
+			c.Data["courseDatas"] = courseDatas
+		}
+
+	}
+	c.TplName = "student/courseList.html"
 }

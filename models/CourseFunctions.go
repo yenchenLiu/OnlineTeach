@@ -25,9 +25,29 @@ func (l *CourseSchedule) Insert() error {
 	return nil
 }
 
-
 func (c *CourseRegistration) Insert() error {
 	if _, err := orm.NewOrm().Insert(c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func GetCourseRegistrationFromStudent(student *Student) (c []*CourseRegistration, num int64, err error) {
+	var table CourseRegistration
+	courses := orm.NewOrm().QueryTable(table).Filter("Student", student).Filter("IsActive", true).OrderBy("-Id")
+	num, err = courses.All(&c)
+	return
+}
+
+func (c *CourseRegistration) LoadTeacher() error {
+	if _, err := orm.NewOrm().LoadRelated(c, "Teacher"); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *CourseRegistration) LoadStudent() error {
+	if _, err := orm.NewOrm().LoadRelated(c, "Student"); err != nil {
 		return err
 	}
 	return nil

@@ -1,0 +1,69 @@
+{{template "student/layout.html" .}}
+
+
+{{ define "Title" }}
+	學生|已安排課程
+{{ end }}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<section id="main-content">
+  <section class="wrapper">
+        <div class="table-agile-info">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                目前課程列表
+                </div>
+                <div>
+                    <table class="table" ui-jq="footable" ui-options="{
+                    &quot;paging&quot;: {
+                        &quot;enabled&quot;: true
+                    },
+                    &quot;filtering&quot;: {
+                        &quot;enabled&quot;: true
+                    },
+                    &quot;sorting&quot;: {
+                        &quot;enabled&quot;: true
+                    }}">
+                    <thead>
+                        <tr>
+                        <th>課程編號</th>
+                        <th>下次上課時間</th>
+                        <th>課程所需點數</th>
+                        <th>老師編號</th>
+                        <th>老師姓名</th>
+                        <th>老師Skype</th>
+                        <th></th>
+                        <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $item := .courseDatas}}
+                        <tr>
+                        <td>{{$item.ID}}</td>
+                        <td></td>
+                        <td>{{$item.Point}}</td>
+                        <td>{{$item.teacherID}}</td>
+                        <td>{{$item.teacherName}}</td>
+                        <td>{{$item.teacherSkype}}</td>
+                        </tr>
+                        {{end}}
+                        
+                    </tbody>
+                    </table>
+                    
+                </div>
+                
+                </div>
+                {{ if .flash.warning }}
+                <div class="alert alert-danger" role="alert">
+                    {{.flash.warning}}
+                </div>
+                {{ end }}
+        </div>
+    </section>
+</section>
+{{end}}

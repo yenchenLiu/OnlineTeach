@@ -117,12 +117,11 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             <span>狀態總覽</span>
                         </a>
                     </li>
-
                     <li>
-                        <a {{if eq .Uri "/student/auditing"}} class="active" {{end}} href="/student/auditing">
-                            <i class="glyphicon glyphicon-th-list"></i>
-                            <span>課程試聽</span>
-                        </a>
+                            <a {{if eq .Uri "/student/courseList"}} class="active" {{end}} href="/student/courseList">
+                                <i class="glyphicon glyphicon-th-list"></i>
+                                <span>課程總覽</span>
+                            </a>
                     </li>
                     <li>
                         <a {{if eq .Uri "/student/deposit"}} class="active" {{end}} href="/student/deposit">
@@ -131,15 +130,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </a>
                     </li>
                     <li>
-                        <a {{if eq .Uri "/student/new/lesson"}} class="active" {{end}} href="/student/new/lesson">
+                        <a {{if eq .Uri "/student/auditing"}} class="active" {{end}} href="/student/auditing">
                             <i class="glyphicon glyphicon-th-list"></i>
-                            <span>新增課程</span>
+                            <span>課程試聽</span>
                         </a>
                     </li>
                     <li>
                         <a {{if eq .Uri "/student/new/lesson"}} class="active" {{end}} href="/student/new/lesson">
                             <i class="glyphicon glyphicon-th-list"></i>
-                            <span>課程總覽</span>
+                            <span>新增課程</span>
                         </a>
                     </li>
                     <li>
