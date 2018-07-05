@@ -57,10 +57,11 @@ type CourseRegistration struct {
 
 type CourseRecord struct {
 	Id                 int
+	Status             string    // 即將上課、上課中、已結束 。 上課中到結束時須轉移點數
 	ClassTimeDate      time.Time `orm:"type(date)"`
 	ClassTimeHour      int8
-	TeachingMaterial   string
-	TeachingDetail     string              `orm:"type(text)"`
+	TeachingMaterial   string              `orm:"default()"`
+	TeachingDetail     string              `orm:"type(text);default()"`
 	CourseRegistration *CourseRegistration `orm:"rel(fk)"` // RelForeignKey relation
 	Created            time.Time           `orm:"auto_now_add;type(datetime)"`
 	Updated            time.Time           `orm:"auto_now;type(datetime)"`

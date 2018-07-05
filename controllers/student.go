@@ -83,15 +83,11 @@ func (c *StudentAuditingController) Post() {
 	auditing.Status = "安排中"
 	d, _ := time.ParseDuration("24h")
 	t := time.Now().Add(2 * d)
-	fmt.Println(t)
 	// (today weekday - expected weekday)
 	days := 7 - int((t.Weekday() - time.Weekday(weekday)))
 	if days >= 7 {
 		days -= 7
 	}
-	fmt.Println(int(t.Weekday()))
-	fmt.Println(int(time.Weekday(weekday)))
-	fmt.Println(int(days))
 
 	t = t.Add(time.Duration(days) * d)
 	fmt.Println(t)
@@ -261,7 +257,7 @@ func (t *TeacherInformation) Get() {
 	teacherData["Name"] = teacher.Profile.Name
 	teacherData["AverageRating"] = strconv.FormatFloat(teacher.AverageRating, 'f', 1, 64)
 	teacherData["TotalClassHour"] = strconv.FormatFloat(teacher.TotalClassHour, 'f', 1, 64)
-
+	teacherData["Proficiency"] = teacher.Proficiency
 	t.Data["lessons"] = lessons
 	t.Data["teacherData"] = teacherData
 	t.TplName = "student/teacherInformation.html"
@@ -284,6 +280,14 @@ func (t *TeacherInformation) Post() {
 	flash := beego.NewFlash()
 
 	o := orm.NewOrm()
+
+	// 檢查點數是否足夠選課
+	if profile.Points < 2 {
+		flash.Warning("點數不足，請先至課程儲值購買點數")
+		flash.Store(&t.Controller)
+		t.Get()
+		return
+	}
 
 	// 檢查與更改學生課表
 	if err := o.QueryTable("CourseSchedule").Filter("Profile", t.GetSession("ProfileId").(int)).Filter("Week", week).One(&schedule); err != nil {
@@ -331,21 +335,22 @@ func (t *TeacherInformation) Post() {
 
 	flash.Success("選課成功，以下為選課老師資訊")
 	flash.Store(&t.Controller)
-	t.Redirect(t.URLFor("CourseList.Get"), 302)
+	t.Redirect(t.URLFor("CourseListForStudent.Get"), 302)
 }
 
-type CourseList struct {
+type CourseListForStudent struct {
 	BaseController
 }
 
-func (c *CourseList) Prepare() {
+func (c *CourseListForStudent) Prepare() {
 	if c.GetSession("IsStudent") != true {
 		c.Abort("401")
 	}
 	c.LoadSession()
+	c.Data["xsrfdata"] = template.HTML(c.XSRFFormHTML())
 }
 
-func (c *CourseList) Get() {
+func (c *CourseListForStudent) Get() {
 	student := models.Student{Id: c.GetSession("student").(int)}
 	student.Read("Id")
 	courses, num, _ := models.GetCourseRegistrationFromStudent(&student)
@@ -356,15 +361,30 @@ func (c *CourseList) Get() {
 		for _, course := range courses {
 			course.LoadTeacher()
 			course.Teacher.LoadProfile()
-			courseDatas = append(courseDatas, map[string]string{
+			courseRecord := models.CourseRecord{Status: "即將上課", CourseRegistration: course}
+			t := map[string]string{
 				"ID":           strconv.Itoa(course.Id),
 				"Point":        strconv.FormatFloat(course.Points, 'f', 2, 64),
 				"teacherID":    strconv.Itoa(course.Teacher.Id),
 				"teacherName":  course.Teacher.Profile.Name,
-				"teacherSkype": course.Teacher.Profile.Skype})
-			c.Data["courseDatas"] = courseDatas
+				"teacherSkype": course.Teacher.Profile.Skype}
+
+			if err := courseRecord.Read("Status", "CourseRegistration"); err == nil {
+				t["classTime"] = courseRecord.ClassTimeDate.Format("2006-01-02") + " " + strconv.Itoa(int(courseRecord.ClassTimeHour)) + ":00"
+			} else {
+				fmt.Println(err)
+			}
+			courseDatas = append(courseDatas, t)
 		}
+		c.Data["courseDatas"] = courseDatas
 
 	}
 	c.TplName = "student/courseList.html"
+}
+func (c *CourseListForStudent) Post() {
+	if len(c.Input()["cancelLesson"]) != 1{
+		c.Abort("400")	
+	}
+	//lessonId = c.Input()["cancelLesson"][0]
+	// TODO 取消課程
 }

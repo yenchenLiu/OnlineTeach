@@ -116,7 +116,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             <span>Dashboard</span>
                         </a>
                     </li>
-
+                    <li>
+                        <a {{if eq .Uri "/teacher/courseList"}} class="active" {{end}} href="/teacher/courseList">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            <span>Student Overview</span>
+                        </a>
+                    </li>
                     <li>
                         <a {{if eq .Uri "/teacher/lesson"}} class="active" {{end}} href="/teacher/lesson">
                             <i class="glyphicon glyphicon-th-list"></i>

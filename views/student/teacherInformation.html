@@ -53,7 +53,7 @@
                                         </tr>
                                         <tr>
                                             <td>老師自傳：</td>
-                                            <td></td>
+                                            <td>{{.teacherData.Proficiency}}</td>
                                         </tr>
                                       </tbody>
                                     </table>
@@ -65,6 +65,11 @@
                     <section class="panel">
                             <header class="panel-heading">
                                 Lesson Schedule
+                                {{ if .flash.warning }}
+                                    <div class="alert alert-danger" role="alert">
+                                    {{.flash.warning}}
+                                    </div>
+                                {{ end }}
                             </header>
                             <div class="panel-body">
                                 <div class="position-center">

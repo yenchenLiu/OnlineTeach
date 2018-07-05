@@ -204,3 +204,43 @@ func (this *TeacherAuditing) Post() {
 
 	this.Get()
 }
+
+type CourseListForTeacher struct {
+	BaseController
+}
+
+func (c *CourseListForTeacher) Prepare() {
+	if c.GetSession("IsTeacher") != true {
+		c.Abort("401")
+	}
+	c.LoadSession()
+}
+
+func (c *CourseListForTeacher) Get() {
+	teacher := models.Teacher{Id: c.GetSession("teacher").(int)}
+	teacher.Read("Id")
+	courses, num, _ := models.GetCourseRegistrationFromTeacher(&teacher)
+	if num == 0 {
+		// TODO 沒有選課時，顯示教學畫面
+	} else {
+		var courseDatas []map[string]string
+		for _, course := range courses {
+			course.LoadStudent()
+			course.Student.LoadProfile()
+			courseRecord := models.CourseRecord{Status: "即將上課", CourseRegistration: course}
+			t := map[string]string{
+				"ID":           strconv.Itoa(course.Id),
+				"Point":        strconv.FormatFloat(course.Points, 'f', 2, 64),
+				"studentID":    strconv.Itoa(course.Student.Id),
+				"studentName":  course.Student.Profile.Name,
+				"studentSkype": course.Student.Profile.Skype}
+			if err := courseRecord.Read("Status", "CourseRegistration"); err == nil {
+				t["classTime"] = courseRecord.ClassTimeDate.Format("2006-01-02") + " " + strconv.Itoa(int(courseRecord.ClassTimeHour)) + ":00"
+			}
+			courseDatas = append(courseDatas, t)
+		}
+		c.Data["courseDatas"] = courseDatas
+
+	}
+	c.TplName = "teacher/courseList.html"
+}

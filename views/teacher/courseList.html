@@ -1,8 +1,8 @@
-{{template "student/layout.html" .}}
+{{template "teacher/layout.html" .}}
 
 
 {{ define "Title" }}
-	學生|已安排課程
+	Teacher|Student Overview
 {{ end }}
 
 {{ define "Head" }}
@@ -15,7 +15,7 @@
         <div class="table-agile-info">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                目前課程列表
+                Student Overview
                 </div>
                 <div>
                     <table class="table" ui-jq="footable" ui-options="{
@@ -30,31 +30,27 @@
                     }}">
                     <thead>
                         <tr>
-                        <th>課程編號</th>
-                        <th>下次上課時間</th>
-                        <th>課程所需點數</th>
-                        <th>老師編號</th>
-                        <th>老師姓名</th>
-                        <th>老師Skype</th>
-                        <th>取消課程</th>
+                        <th>Lesson Number</th>
+                        <th>Next Class Time</th>
+                        <th>Points Required</th>
+                        <th>Student Number</th>
+                        <th>Student Name</th>
+                        <th>Student Skype</th>
+                        <th></th>
                         <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <form method="POST">
-                                {{.xsrfdata}}
                         {{range $item := .courseDatas}}
                         <tr>
                         <td>{{$item.ID}}</td>
                         <td>{{$item.classTime}}</td>
                         <td>{{$item.Point}}</td>
-                        <td>{{$item.teacherID}}</td>
-                        <td>{{$item.teacherName}}</td>
-                        <td>{{$item.teacherSkype}}</td>
-                        <td><div class="lesson_td"><button class="" type="submit" name="cancelLesson" value="{{$item.ID}}">取消課程</button></div></td>
+                        <td>{{$item.studentID}}</td>
+                        <td>{{$item.studentName}}</td>
+                        <td>{{$item.studentSkype}}</td>
                         </tr>
                         {{end}}
-                        </form>
                         
                     </tbody>
                     </table>
