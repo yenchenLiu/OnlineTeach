@@ -382,9 +382,51 @@ func (c *CourseListForStudent) Get() {
 	c.TplName = "student/courseList.html"
 }
 func (c *CourseListForStudent) Post() {
-	if len(c.Input()["cancelLesson"]) != 1{
-		c.Abort("400")	
+	if len(c.Input()["cancelLesson"]) != 1 {
+		c.Abort("400")
 	}
-	//lessonId = c.Input()["cancelLesson"][0]
-	// TODO 取消課程
+
+	lessonId, _ := strconv.ParseInt(c.Input()["cancelLesson"][0], 10, 64)
+	courseRegistration := models.CourseRegistration{Id: int(lessonId)}
+	courseRegistration.Read("Id")
+	// 判斷是否為本人取消課程
+	courseRegistration.LoadStudent()
+	if courseRegistration.Student.Id != c.GetSession("student").(int) {
+		c.Abort("401")
+	}
+	courseRecord := models.CourseRecord{Status: "即將上課", CourseRegistration: &courseRegistration}
+	if err := courseRecord.Read("Status", "CourseRegistration"); err == nil {
+		courseRecord.Status = "已取消"
+		courseRecord.Update("Status")
+	} else {
+		fmt.Println(err)
+	}
+	courseRegistration.IsActive = false
+	courseRegistration.Update("IsActive")
+	// 取消老師與學生課程
+	courseRegistration.LoadTeacher()
+	courseRegistration.LoadStudent()
+	courseRegistration.Student.LoadProfile()
+	courseRegistration.Teacher.LoadProfile()
+
+	var student_schedule models.CourseSchedule
+	o := orm.NewOrm()
+	week := courseRegistration.ClassWeek
+	hour := courseRegistration.ClassHour
+	// 檢查與更改學生課表
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Student.Profile).Filter("Week", week).One(&student_schedule); err != nil {
+		fmt.Println(err)
+	}
+
+	setField(&student_schedule, "H"+strconv.Itoa(int(hour)), -1)
+	student_schedule.Update("H" + strconv.Itoa(int(hour)))
+
+	var teacher_schedule models.CourseSchedule
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Teacher.Profile).Filter("Week", week).One(&teacher_schedule); err != nil {
+		fmt.Println(err)
+	}
+	setField(&teacher_schedule, "H"+strconv.Itoa(int(hour)), 0)
+	teacher_schedule.Update("H" + strconv.Itoa(int(hour)))
+
+	c.Get()
 }

@@ -25,12 +25,29 @@ func (c *CourseSchedule) Insert() error {
 	return nil
 }
 
+
+func (c *CourseRegistration) Read(fields ...string) error {
+	if err := orm.NewOrm().Read(c, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CourseRegistration) Insert() error {
 	if _, err := orm.NewOrm().Insert(c); err != nil {
 		return err
 	}
 	return nil
 }
+
+
+func (c *CourseRegistration) Update(fields ...string) error {
+	if _, err := orm.NewOrm().Update(c, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func (c *CourseRecord) Read(fields ...string) error {
 	if err := orm.NewOrm().Read(c, fields...); err != nil {
@@ -48,6 +65,14 @@ func (c *CourseRecord) Insert() error {
 
 func (c *CourseRecord) Update(fields ...string) error {
 	if _, err := orm.NewOrm().Update(c, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+
+func (c *CourseRecord) LoadRegistration() error {
+	if _, err := orm.NewOrm().LoadRelated(c, "CourseRegistration"); err != nil {
 		return err
 	}
 	return nil
