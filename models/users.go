@@ -48,6 +48,7 @@ type Teacher struct {
 	Proficiency        string `orm:"type(text)"`
 	Resume             string
 	Youtube            string
+	PayPal             string
 	AverageRating      float64               `orm:"digits(2);decimals(1);default(0.0)"`
 	TotalClassHour     float64               `orm:"digits(2);decimals(1);default(0.0)"`
 	ClassValue         float64               `orm:"digits(12);decimals(2);default(2.00)"`

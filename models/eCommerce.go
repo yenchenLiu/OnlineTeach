@@ -41,12 +41,26 @@ type PointsTrade struct {
 	Points               float64                    `orm:"digits(12);decimals(2);default(0.00)"`
 	Description          string                     `orm:"type(text)"`
 	PaymentReceiveRecord *EZPayPaymentReceiveRecord `orm:"reverse(one);null"` // Reverse relationship (optional)
+	CourseRecord         *CourseRecord              `orm:"rel(fk);null"`      // Reverse relationship (optional)
 	ProfileReceiver      *Profile                   `orm:"rel(fk);null"`      // RelForeignKey relation
 	ProfileGiver         *Profile                   `orm:"rel(fk);null"`      // RelForeignKey relation
+	Created              time.Time                  `orm:"auto_now_add;type(datetime)"`
+	Updated              time.Time                  `orm:"auto_now;type(datetime)"`
+}
+
+type WithdrawRecord struct {
+	Id          int
+	Points      float64 `orm:"digits(12);decimals(2);default(0.00)"`
+	PayPal      string
+	Profile     *Profile  `orm:"rel(fk);null"` // RelForeignKey relation
+	Process    string    // 處理進度 [suspending、handling、solved、error]
+	Description string    `orm:"type(text)"`
+	Created     time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated     time.Time `orm:"auto_now;type(datetime)"`
 }
 
 func init() {
 	// Need to register model in init
-	orm.RegisterModel(new(EZPayPaymentApplicationRecord), new(EZPayPaymentReceiveRecord), new(PointsTrade))
+	orm.RegisterModel(new(EZPayPaymentApplicationRecord), new(EZPayPaymentReceiveRecord), new(PointsTrade), new(WithdrawRecord))
 
 }

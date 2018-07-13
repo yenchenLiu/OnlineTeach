@@ -135,7 +135,7 @@ func (s *StudentDepositController) Prepare() {
 
 func (s *StudentDepositController) Get() {
 	profile := models.Profile{Id: s.GetSession("ProfileId").(int)}
-
+	profile.Read("Id")
 	s.Data["Points"] = strconv.FormatFloat(profile.Points, 'f', 1, 64)
 	s.TplName = "student/deposit.html"
 }
@@ -386,8 +386,8 @@ func (c *CourseListForStudent) Post() {
 		c.Abort("400")
 	}
 
-	lessonId, _ := strconv.ParseInt(c.Input()["cancelLesson"][0], 10, 64)
-	courseRegistration := models.CourseRegistration{Id: int(lessonId)}
+	lessonID, _ := strconv.ParseInt(c.Input()["cancelLesson"][0], 10, 64)
+	courseRegistration := models.CourseRegistration{Id: int(lessonID)}
 	courseRegistration.Read("Id")
 	// 判斷是否為本人取消課程
 	courseRegistration.LoadStudent()
@@ -409,24 +409,24 @@ func (c *CourseListForStudent) Post() {
 	courseRegistration.Student.LoadProfile()
 	courseRegistration.Teacher.LoadProfile()
 
-	var student_schedule models.CourseSchedule
+	var studentSchedule models.CourseSchedule
 	o := orm.NewOrm()
 	week := courseRegistration.ClassWeek
 	hour := courseRegistration.ClassHour
 	// 檢查與更改學生課表
-	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Student.Profile).Filter("Week", week).One(&student_schedule); err != nil {
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Student.Profile).Filter("Week", week).One(&studentSchedule); err != nil {
 		fmt.Println(err)
 	}
 
-	setField(&student_schedule, "H"+strconv.Itoa(int(hour)), -1)
-	student_schedule.Update("H" + strconv.Itoa(int(hour)))
+	setField(&studentSchedule, "H"+strconv.Itoa(int(hour)), -1)
+	studentSchedule.Update("H" + strconv.Itoa(int(hour)))
 
-	var teacher_schedule models.CourseSchedule
-	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Teacher.Profile).Filter("Week", week).One(&teacher_schedule); err != nil {
+	var teacherSchedule models.CourseSchedule
+	if err := o.QueryTable("CourseSchedule").Filter("Profile", courseRegistration.Teacher.Profile).Filter("Week", week).One(&teacherSchedule); err != nil {
 		fmt.Println(err)
 	}
-	setField(&teacher_schedule, "H"+strconv.Itoa(int(hour)), 0)
-	teacher_schedule.Update("H" + strconv.Itoa(int(hour)))
+	setField(&teacherSchedule, "H"+strconv.Itoa(int(hour)), 0)
+	teacherSchedule.Update("H" + strconv.Itoa(int(hour)))
 
 	c.Get()
 }

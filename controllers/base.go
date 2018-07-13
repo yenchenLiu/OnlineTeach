@@ -11,6 +11,7 @@ type BaseController struct {
 }
 
 func (c *BaseController) LoadSession() {
+
 	c.Data["IsLogin"] = c.GetSession("IsLogin")
 	c.Data["IsStudent"] = c.GetSession("IsStudent")
 	c.Data["IsTeacher"] = c.GetSession("IsTeacher")

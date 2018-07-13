@@ -62,7 +62,8 @@ type CourseRecord struct {
 	ClassTimeHour      int8
 	TeachingMaterial   string              `orm:"default()"`
 	TeachingDetail     string              `orm:"type(text);default()"`
-	CourseRegistration *CourseRegistration `orm:"rel(fk)"` // RelForeignKey relation
+	CourseRegistration *CourseRegistration `orm:"rel(fk)"`             // RelForeignKey relation
+	PointsTrades       []*PointsTrade      `orm:"reverse(many); null"` // reverse relationship of fk
 	Created            time.Time           `orm:"auto_now_add;type(datetime)"`
 	Updated            time.Time           `orm:"auto_now;type(datetime)"`
 }

@@ -25,13 +25,12 @@ func init() {
 	}
 }
 
-func main() {
-
-	orm.Debug = true
+func createSuperUser() {
 	o := orm.NewOrm()
 	o.Using("default")
 
 	err := o.Begin()
+
 	profile := new(models.Profile)
 	profile.Name = "Yenchen"
 	profile.Identity = "admin"
@@ -56,6 +55,75 @@ func main() {
 	} else {
 		o.Commit()
 	}
+}
+
+func createCustodyAccount() {
+
+	o := orm.NewOrm()
+	o.Using("default")
+
+	err := o.Begin()
+	// 上課點數保管
+	profile := new(models.Profile)
+	profile.Name = "Custody"
+	profile.Identity = "admin"
+
+	user := new(models.User)
+	user.Profile = profile
+	user.Email = "custody@daychen.tw"
+	user.Password = "yenchen"
+	user.IsActive = false
+
+	if err == nil {
+		_, err = o.Insert(profile)
+	}
+	if err == nil {
+		_, err = o.Insert(user)
+	}
+	if err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
+	}
+}
+
+func createWithdrawAccount() {
+
+	o := orm.NewOrm()
+	o.Using("default")
+
+	err := o.Begin()
+	// 點數提領帳戶
+	profile := new(models.Profile)
+	profile.Name = "Withdraw"
+	profile.Identity = "admin"
+
+	user := new(models.User)
+	user.Profile = profile
+	user.Email = "withdraw@daychen.tw"
+	user.Password = "yenchen"
+	user.IsActive = false
+
+	if err == nil {
+		_, err = o.Insert(profile)
+	}
+	if err == nil {
+		_, err = o.Insert(user)
+	}
+	if err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
+	}
+}
+
+func main() {
+
+	orm.Debug = true
+
+	createSuperUser()
+	createCustodyAccount()
+	createWithdrawAccount()
 
 	beego.AddFuncMap("AddNumber", lib.AddNumber)
 	beego.ErrorController(&controllers.ErrorController{})

@@ -1,0 +1,145 @@
+{{template "teacher/layout.html" .}}
+
+
+{{ define "Title" }}
+	Teacher|Withdraw Money
+{{ end }}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<!--main content start-->
+<section id="main-content">
+    <section class="wrapper">
+        <div class="form-w3layouts">
+            <!-- page start-->
+            <!-- page start-->
+            {{ if .flash.warning }}
+            <div class="alert alert-danger" role="alert">
+                {{.flash.warning}}
+            </div>
+            {{ end }}
+            <div class="row">
+                <div class="col-lg-12">
+                        <div class="panel panel-default">
+                                <div class="panel-heading">
+                                 Points Data
+                                </div>
+                                <div>
+                                  <table class="table" ui-jq="footable" ui-options="{
+                                    &quot;paging&quot;: {
+                                      &quot;enabled&quot;: true
+                                    },
+                                    &quot;filtering&quot;: {
+                                      &quot;enabled&quot;: true
+                                    },
+                                    &quot;sorting&quot;: {
+                                      &quot;enabled&quot;: true
+                                    }}">
+                                    <tbody>
+                                      <tr>
+                                        <td>Owned points</td>
+                                        <td>{{.Points}}</td>
+                                      </tr>
+                                      
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                        <section class="panel">
+                            <header class="panel-heading">
+                                Withdraw Money
+                            </header>
+                            <div class="panel-body">
+                                <div class="position-center">
+                                <form class="form-horizontal bucket-form" method="post">
+                                    {{.xsrfdata}}
+                                        <div class="form-group">
+                                            {{ if ge .PointsFloat 10.0}}
+                                            <div class="row">
+                                                <label class="col-sm-3 control-label col-lg-3">PayPal.me Address</label>
+                                                <div class="col-lg-6">
+                                                    <input type="url" name="paypal" style="width:100%;" value="{{.PayPal}}">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-sm-3 control-label col-lg-3">withdraw</label>
+                                                <div class="col-lg-6">
+                                                    
+                                                    <select class="form-control input-lg m-bot15" name="withdraw">
+                                                        <option value="10">10 points(About 800 to 850 NT$)</option>
+                                                        {{ if ge .PointsFloat 20.0}}<option value="20">20 points(About 1600 to 1700 NT$)</option>{{end}}
+                                                        {{ if ge .PointsFloat 50.0}}<option value="50">50 points(About 4000 to 4250 NT$)</option>{{end}}
+                                                        {{ if ge .PointsFloat 100.0}}<option value="100">100 points(About 8000 to 8500 NT$)</option>{{end}}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <label class="col-sm-3 control-label col-lg-3"></label>
+                                                <div class="col-lg-6">
+                                                <button type="submit" class="btn btn-info">submit</button>
+                                            </div>
+                                            </div>
+                                            {{else}}
+                                                <label>You don't have enough. It takes at least 10 points to withdraw cash.</label>
+                                            {{end}}
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                        </section>
+                        <span>
+                            <p>1. If you don't have a paypal account, please apply for a new account.</p>
+                            <p>2. Please use PayPal account to create a payment address. <a href="https://www.paypal.me/" target="_blank">https://www.paypal.me/</a></p>
+                        </span>
+                </div>
+                
+            </div>
+            <div class="table-agile-info">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                    Withdraw Overview
+                    </div>
+                    <div>
+                        <table class="table">
+                        <thead>
+                            <tr>
+                            <th>Points</th>
+                            <th>PayPal</th>
+                            <th>Processe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $item := .withdraw}}
+                            <tr>
+                            <td>{{$item.Points}}</td>
+                            <td>{{$item.PayPal}}</td>
+                            <td>{{$item.Process}}</td>
+                            </tr>
+                            {{end}}
+                            
+                        </tbody>
+                        </table>
+                        
+                    </div>
+                    
+                    </div>
+                    
+            </div>
+    
+    
+            <!-- page end-->
+            </div>
+    </section>
+     <!-- footer -->
+              <div class="footer">
+                <div class="wthree-copyright">
+                  <p>© 2018 English. All rights reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p>
+                </div>
+              </div>
+      <!-- / footer -->
+    </section>
+{{ end }}

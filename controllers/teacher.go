@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/astaxie/beego"
+
 	"github.com/astaxie/beego/orm"
 )
 
@@ -158,21 +160,21 @@ func (this *TeacherAuditing) Get() {
 		students = append(students, item.Student.Id)
 	}
 	this.Data["teacherAuditing"] = teacherAuditing
-	var auditings_2 []models.StudentAuditing
+	var auditings2 []models.StudentAuditing
 	qs = o.QueryTable("StudentAuditing")
 	// 如果老師教的學生數不等於0
 	if len(students) != 0 {
-		if _, err := qs.Filter("Status", "安排中").Exclude("student__id__in", students).All(&auditings_2); err != nil {
+		if _, err := qs.Filter("Status", "安排中").Exclude("student__id__in", students).All(&auditings2); err != nil {
 			fmt.Println(err)
 		}
 	} else {
-		if _, err := qs.Filter("Status", "安排中").All(&auditings_2); err != nil {
+		if _, err := qs.Filter("Status", "安排中").All(&auditings2); err != nil {
 			fmt.Println(err)
 		}
 	}
 
 	var auditing []map[string]string
-	for _, item := range auditings_2 {
+	for _, item := range auditings2 {
 		var schedule models.CourseSchedule
 		o.QueryTable("CourseSchedule").Filter("profile__id", this.GetSession("ProfileId").(int)).Filter("Week", item.Day).One(&schedule)
 		if getField(&schedule, "H"+strconv.Itoa(item.Hour)) == 0 {
@@ -243,4 +245,117 @@ func (c *CourseListForTeacher) Get() {
 
 	}
 	c.TplName = "teacher/courseList.html"
+}
+
+type WithdrawMoney struct {
+	BaseController
+}
+
+func (w *WithdrawMoney) Prepare() {
+	if w.GetSession("IsTeacher") != true {
+		w.Abort("401")
+	}
+	w.LoadSession()
+	w.Data["xsrfdata"] = template.HTML(w.XSRFFormHTML())
+}
+
+func (w *WithdrawMoney) Get() {
+	profile := models.Profile{Id: w.GetSession("ProfileId").(int)}
+	profile.Read("Id")
+	profile.LoadTeacher()
+	w.Data["Points"] = strconv.FormatFloat(profile.Points, 'f', 1, 64)
+	w.Data["PointsFloat"] = float64(profile.Points)
+	if len(profile.Teacher.PayPal) > 22 {
+		w.Data["PayPal"] = profile.Teacher.PayPal
+	} else {
+		w.Data["PayPal"] = "https://www.paypal.me/"
+	}
+
+	var withdrawRecord []models.WithdrawRecord
+	o := orm.NewOrm()
+	// 取得取款紀錄
+	qs := o.QueryTable("WithdrawRecord")
+	if _, err := qs.Filter("profile__id", profile.Id).All(&withdrawRecord); err != nil {
+		fmt.Println(err)
+	}
+	var withdrawRecords []map[string]string
+	for _, item := range withdrawRecord {
+		withdrawRecords = append(withdrawRecords, map[string]string{
+			"Points":  strconv.FormatFloat(item.Points, 'f', 2, 64),
+			"PayPal":  item.PayPal,
+			"Process": item.Process})
+	}
+	w.Data["withdraw"] = withdrawRecords
+
+	w.TplName = "teacher/withdraw.html"
+}
+
+func (w *WithdrawMoney) Post() {
+
+	point, _ := strconv.ParseInt(w.Input()["withdraw"][0], 10, 64)
+	paypal := w.Input()["paypal"][0]
+	if len(paypal) < 24 {
+		flash := beego.NewFlash()
+		flash.Warning("PayPal URL error, please fill in the URL of paypal.me. Please see the note for details.")
+		flash.Store(&w.Controller)
+		w.Get()
+		return
+	}
+
+	profile := models.Profile{Id: w.GetSession("ProfileId").(int)}
+	profile.Read("Id")
+
+	// 點數不足，跳出錯誤頁面
+	if float64(point) > profile.Points {
+		w.Abort("400")
+	}
+	profile.LoadTeacher()
+	profile.Teacher.PayPal = paypal
+	profile.Teacher.Update("PayPal")
+
+	withdrawUser := models.User{Email: "withdraw@daychen.tw"}
+	withdrawUser.Read("Email")
+	withdrawUser.LoadProfile()
+
+	money := strconv.Itoa(int(point * 85))
+
+	o := orm.NewOrm()
+	o.Using("default")
+
+	err := o.Begin()
+	withdrawRecord := new(models.WithdrawRecord)
+	withdrawRecord.Points = float64(point)
+	withdrawRecord.PayPal = paypal
+	withdrawRecord.Profile = &profile
+	withdrawRecord.Process = "suspending"
+	withdrawRecord.Description = profile.Name + "提領" + w.Input()["withdraw"][0] + "點，要匯款" + money + "元"
+
+	pointsTrade := new(models.PointsTrade)
+	pointsTrade.Points = float64(point)
+	pointsTrade.Description = profile.Name + "提領" + w.Input()["withdraw"][0] + "點，要匯款" + money + "元"
+	pointsTrade.ProfileGiver = &profile
+	pointsTrade.ProfileReceiver = withdrawUser.Profile
+
+	profile.Points -= float64(point)
+	withdrawUser.Profile.Points += float64(point)
+
+	if err == nil {
+		_, err = o.Insert(withdrawRecord)
+	}
+	if err == nil {
+		_, err = o.Insert(pointsTrade)
+	}
+	if err == nil {
+		_, err = o.Update(&profile, "Points")
+	}
+	if err == nil {
+		_, err = o.Update(withdrawUser.Profile, "Points")
+	}
+	if err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
+	}
+
+	w.Get()
 }
