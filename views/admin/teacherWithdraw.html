@@ -1,0 +1,73 @@
+{{template "admin/layout.html" .}}
+
+{{ define "Title" }}
+	Admin|TeacherWithdraw
+{{ end }}
+
+
+{{ define "Content" }}
+<section id="main-content">
+    <section class="wrapper">
+      <div class="col-lg-12">
+            <form action="#" method="POST">
+                    {{ .xsrfdata}}
+                <div class="table-agile-info">
+                    <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Teacher Withdraw Money
+                    </div>
+                <div class="table-responsive">
+                        <table class="table table-striped b-t b-light">
+                        <thead>
+                            <tr>
+                            <th>老師編號</th>
+                            <th>老師姓名</th>
+                            <th>提領點數</th>
+                            <th>Paypal</th>
+                            <th>處理狀態</th>
+                            <th>備註</th>
+                            <th>申請時間</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                {{ range $data := .withdraw}}
+                                    <tr>
+                                        <td>{{$data.profileId}}</td>
+                                        <td>{{$data.Name}}</td>
+                                        <td>{{$data.Points}}</td>
+                                        <td><a href="{{$data.PayPal}}" target="_blank">{{$data.PayPal}}</a></td>
+                                        <td>{{$data.Process}}</td>
+                                        <td>{{$data.Description}}</td>
+                                        <td>{{$data.Created}}</td>
+                                    </tr>
+                                    
+                                {{end}}
+                            </tbody>
+                        </table>
+            
+                </div>
+                <footer class="panel-footer">
+                    <div class="row">
+                    
+                    <div class="col-sm-5 text-center">
+                        <small class="text-muted inline m-t-sm m-b-sm">showing 20-30 of 50 items</small>
+                    </div>
+                    <div class="col-sm-7 text-right text-center-xs">                
+                        <ul class="pagination pagination-sm m-t-none m-b-none">
+                        <li><a href=""><i class="fa fa-chevron-left"></i></a></li>
+                        <li><a href="">1</a></li>
+                        <li><a href="">2</a></li>
+                        <li><a href="">3</a></li>
+                        <li><a href="">4</a></li>
+                        <li><a href=""><i class="fa fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                    </div>
+                </footer>
+                </div>
+            </div>
+            </form>
+        </div>
+    </section>
+</section>
+{{end}}

@@ -75,7 +75,15 @@ func SignupTeacher(u *models.User, p *models.Profile, t *models.Teacher, tg *mod
 	userData.Data = emailVerify
 	userData.Insert()
 
-	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
+	if beego.AppConfig.String("runmode") == "dev" {
+		u.IsActive = true
+		u.Update("IsActive")
+		t.IsActive = true
+		t.Update("IsActive")
+		models.CreateLessonSchedule(p)
+	} else {
+		lib.SendVerifyMail(u.Email, emailVerify)
+	}
 	return u.Id, err
 }
 
@@ -104,7 +112,14 @@ func SignupStudent(u *models.User, p *models.Profile) (int, error) {
 	userData.Data = emailVerify
 	userData.Insert()
 	p.InsertStudent()
-	lib.SendVerifyMail("s412172010@gmail.com", emailVerify)
+
+	if beego.AppConfig.String("runmode") == "dev" {
+		u.IsActive = true
+		u.Update("IsActive")
+		models.CreateLessonSchedule(p)
+	} else {
+		lib.SendVerifyMail(u.Email, emailVerify)
+	}
 	return u.Id, err
 }
 
@@ -179,8 +194,12 @@ func (c *AuthController) Login() {
 		return
 	}
 	flash := beego.NewFlash()
-
-	if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
+	if len(c.Input()["g-recaptcha-response"]) == 0 {
+		flash.Warning("無法通過驗證")
+		flash.Store(&c.Controller)
+		c.Get()
+		return
+	} else if lib.ReCAPTCHAVerify(c.Input()["g-recaptcha-response"][0]) != true {
 		flash.Warning("無法通過驗證")
 		flash.Store(&c.Controller)
 		c.Get()
@@ -331,8 +350,8 @@ func (c *AuthController) SignupTeacher() {
 	user := new(models.User)
 	profile := new(models.Profile)
 	tg := new(models.TeacherTags)
-	t := &models.Teacher{}
-	if err = c.ParseForm(t); err != nil {
+	teacher := &models.Teacher{}
+	if err = c.ParseForm(teacher); err != nil {
 		flash.Error("Signup invalid!")
 		flash.Store(&c.Controller)
 		return
@@ -361,14 +380,14 @@ func (c *AuthController) SignupTeacher() {
 	b := []byte(register["Email"][0])
 	has := md5.Sum(b)
 	filename := hex.EncodeToString(has[:])
-	t.Resume = filename + ".pdf"
+	teacher.Resume = filename + ".pdf"
 	if err := c.SaveToFile("ResumeFile", "./resumes/"+filename+".pdf"); err != nil {
 		flash.Warning(err.Error())
 		flash.Store(&c.Controller)
 		return
 	}
-
-	id, err := SignupTeacher(user, profile, t, tg)
+	teacher.ClassValue = 2
+	id, err := SignupTeacher(user, profile, teacher, tg)
 	if err != nil || id < 1 {
 		flash.Warning(err.Error())
 		flash.Store(&c.Controller)

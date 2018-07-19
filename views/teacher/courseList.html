@@ -1,0 +1,60 @@
+{{template "teacher/layout.html" .}}
+
+
+{{ define "Title" }}
+	Teacher|Student Overview
+{{ end }}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<section id="main-content">
+  <section class="wrapper">
+        <div class="table-agile-info">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                Student Overview
+                </div>
+                <div>
+                    <table class="table">
+                    <thead>
+                        <tr>
+                        <th>Lesson Number</th>
+                        <th>Next Class Time</th>
+                        <th>Points Required</th>
+                        <th>Student Number</th>
+                        <th>Student Name</th>
+                        <th>Student Skype</th>
+                        <th></th>
+                        <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $item := .courseDatas}}
+                        <tr>
+                        <td>{{$item.ID}}</td>
+                        <td>{{$item.classTime}}</td>
+                        <td>{{$item.Point}}</td>
+                        <td>{{$item.studentID}}</td>
+                        <td>{{$item.studentName}}</td>
+                        <td>{{$item.studentSkype}}</td>
+                        </tr>
+                        {{end}}
+                        
+                    </tbody>
+                    </table>
+                    
+                </div>
+                
+                </div>
+                {{ if .flash.warning }}
+                <div class="alert alert-danger" role="alert">
+                    {{.flash.warning}}
+                </div>
+                {{ end }}
+        </div>
+    </section>
+</section>
+{{end}}

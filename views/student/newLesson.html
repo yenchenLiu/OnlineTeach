@@ -1,0 +1,82 @@
+{{template "student/layout.html" .}}
+
+
+{{ define "Title" }}
+	學生|新增課程
+{{ end }}
+
+{{ define "Head" }}
+{{ end }}
+
+
+{{ define "Content" }}
+<section id="main-content">
+  <section class="wrapper">
+
+        <div class="table-agile-info">
+                <div class="panel panel-default">
+                   <div class="panel-heading">
+                    老師資料
+                   </div>
+                   <p align="right"><input id="search" type="search" class="form-control search" placeholder="搜尋" onsearch="searchTeacher()"></p>
+                   <div>
+                     <table class="table" ui-jq="footable" ui-options="{
+                       &quot;paging&quot;: {
+                         &quot;enabled&quot;: true
+                       },
+                       &quot;filtering&quot;: {
+                         &quot;enabled&quot;: true
+                       },
+                       &quot;sorting&quot;: {
+                         &quot;enabled&quot;: true
+                       }}">
+                       <thead>
+                         <tr>
+                           <th>老師編號</th>
+                           <th>老師姓名</th>
+                           <th>綜合評分</th>
+                           <th>平台上課時數</th>
+                           <th>詳細介紹</th>
+                         </tr>
+                       </thead>
+                       <tbody>
+                          {{ range $data := .teachers}}
+                         <tr>
+                           <td>{{$data.Id}}</td>
+                           <td>{{$data.Name}}</td>
+                           <td>{{$data.Rating}}/5</td>
+                           <td>{{$data.TotalClassHour}} 小時</td>
+                           <td>
+                              <div>
+                                  <a href="/student/teacherInformation/{{$data.Id}}" class="btn btn-success">
+                                    介紹
+                                  </a>
+                              </div>
+                           </td>
+                         </tr>
+                         {{ end }}
+                       </tbody>
+                     </table>
+                     
+                   </div>
+                   
+                 </div>
+                 {{ if .flash.warning }}
+                    <div class="alert alert-danger" role="alert">
+                      {{.flash.warning}}
+                    </div>
+                 {{ end }}
+        </div>
+  </section>
+</section>
+{{ end }}
+
+{{ define "Scripts"}}
+<script>
+function searchTeacher() {
+
+  var x = document.getElementById("search");
+  location.href = "?search=" + x.value
+}
+</script>
+{{ end }}

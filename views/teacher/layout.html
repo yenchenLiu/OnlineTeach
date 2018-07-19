@@ -32,8 +32,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 <header class="header fixed-top clearfix">
         <!--logo start-->
         <div class="brand">
-            <a href="/index.html" class="logo">
-                English
+            <a href="/index.html" class="logo" style="font-size: 20px">
+                線上英文家教平台<br>OnlineTeach.ASIA
             </a>
             <div class="sidebar-toggle-box">
                 <div class="fa fa-bars"></div>
@@ -116,7 +116,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             <span>Dashboard</span>
                         </a>
                     </li>
-
+                    <li>
+                        <a {{if eq .Uri "/teacher/courseList"}} class="active" {{end}} href="/teacher/courseList">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            <span>Student Overview</span>
+                        </a>
+                    </li>
                     <li>
                         <a {{if eq .Uri "/teacher/lesson"}} class="active" {{end}} href="/teacher/lesson">
                             <i class="glyphicon glyphicon-th-list"></i>
@@ -128,6 +133,13 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <a {{if eq .Uri "/teacher/auditing"}} class="active" {{end}} href="/teacher/auditing">
                             <i class="glyphicon glyphicon-th-list"></i>
                             <span>Student Auditing</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a {{if eq .Uri "/teacher/withdraw"}} class="active" {{end}} href="/teacher/withdraw">
+                            <i class="glyphicon glyphicon-th-list"></i>
+                            <span>Withdraw Money</span>
                         </a>
                     </li>
                 </ul>            
