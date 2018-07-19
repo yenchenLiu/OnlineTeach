@@ -1,0 +1,24 @@
+{{ template "layout.html" .}}
+
+{{ define "Title" }}
+註冊
+{{ end }}
+
+{{ define "Content" }}
+<div class="reg-w3">
+<div class="w3layouts-main">
+    <h2>Register Now</h2>
+    {{ if .flash.success }}
+		<div class="alert alert-success" role="alert">
+			<strong>Success!</strong> {{.flash.success}}
+		</div>
+	{{ end }}
+	{{ if .flash.warning }}
+		<div class="alert alert-danger" role="alert">
+			<strong>Error!</strong> {{.flash.warning}}
+		</div>
+	{{ end }}
+	<a href="/index/">返回首頁(back to home)</a>
+</div>
+</div>
+{{ end }}
