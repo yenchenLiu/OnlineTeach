@@ -68,3 +68,10 @@ func (this *EZPayPaymentReceiveRecord) Deposit(p *Profile) error {
 	o.Commit()
 	return nil
 }
+
+func (w *WithdrawRecord) LoadProfile() error {
+	if _, err := orm.NewOrm().LoadRelated(w, "Profile"); err != nil {
+		return err
+	}
+	return nil
+}

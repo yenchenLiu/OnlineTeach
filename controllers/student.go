@@ -271,6 +271,7 @@ func (t *TeacherInformation) Post() {
 	}
 	teacher.LoadProfile()
 	profile := models.Profile{Id: t.GetSession("ProfileId").(int)}
+	profile.Read("Id")
 	profile.LoadStudent()
 	student := profile.Student
 	value := strings.Split(t.Input()["addLesson"][0], "_")

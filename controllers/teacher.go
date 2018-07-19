@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"time"
 	"OnlineTeach/models"
 	"fmt"
 	"html/template"
@@ -277,13 +278,18 @@ func (w *WithdrawMoney) Get() {
 	qs := o.QueryTable("WithdrawRecord")
 	if _, err := qs.Filter("profile__id", profile.Id).All(&withdrawRecord); err != nil {
 		fmt.Println(err)
+		return
 	}
+	location, _ := time.LoadLocation("Asia/Taipei")
 	var withdrawRecords []map[string]string
 	for _, item := range withdrawRecord {
+		local := item.Created
+		local = local.In(location)
 		withdrawRecords = append(withdrawRecords, map[string]string{
 			"Points":  strconv.FormatFloat(item.Points, 'f', 2, 64),
 			"PayPal":  item.PayPal,
-			"Process": item.Process})
+			"Process": item.Process,
+			"Created": local.Format("2006-01-02 15:04:05")})
 	}
 	w.Data["withdraw"] = withdrawRecords
 

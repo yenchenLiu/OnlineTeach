@@ -15,14 +15,14 @@ func init() {
 	beego.Router("/signup", &controllers.AuthController{}, "*:Signup")
 	beego.Router("/verify/:verify", &controllers.AuthController{}, "get:VerifyEmail")
 	beego.Router("/signup/teacher", &controllers.AuthController{}, "*:SignupTeacher")
-	
+
 	// 學生事務
 	beego.Router("/student/auditing", &controllers.StudentAuditingController{})
 	beego.Router("/student/deposit", &controllers.StudentDepositController{})
 	beego.Router("/student/new/lesson", &controllers.NewLessonController{})
 	beego.Router("/student/teacherInformation/:Id", &controllers.TeacherInformation{})
 	beego.Router("/student/courseList", &controllers.CourseListForStudent{})
-	
+
 	// 老師事務
 	beego.Router("/teacher/lesson", &controllers.LessonController{})
 	beego.Router("/teacher/auditing", &controllers.TeacherAuditing{})
@@ -32,7 +32,8 @@ func init() {
 	// 管理員事務
 	beego.Router("/admin/reviewresume", &controllers.AdminReviewResumeController{})
 	beego.Router("/admin/reviewresume/:name/:file", &controllers.AdminReviewResumeController{}, "get:Download")
-	
+	beego.Router("/admin/withdraw", &controllers.AdminProcessWithdrawMoney{})
+
 	// 電子商務
 	beego.Router("/ecpay/receive", &controllers.ECPayController{})
 

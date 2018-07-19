@@ -62,8 +62,8 @@ func RefreshALLCourse() {
 			// 沒有課程單，新增課程單
 			courseRecord := new(models.CourseRecord)
 			courseRecord.Status = "即將上課"
-			courseRecord.ClassTimeDate = t                // TODO 改成上課日期
-			courseRecord.ClassTimeHour = course.ClassHour // 改成上課時間
+			courseRecord.ClassTimeDate = t
+			courseRecord.ClassTimeHour = course.ClassHour
 			courseRecord.CourseRegistration = course
 			courseRecord.Insert()
 
