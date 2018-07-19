@@ -254,6 +254,13 @@ func (c *AuthController) Signup() {
 		flash.Store(&c.Controller)
 		return
 	}
+	password := c.GetString("Password")
+
+	if len(password) < 8 {
+		flash.Warning("密碼請輸入至少8位數字(Password requires at least 8 digits)")
+		flash.Store(&c.Controller)
+		return
+	}
 
 	var err error
 

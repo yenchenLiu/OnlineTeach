@@ -43,8 +43,9 @@ func RefreshALLCourse() {
 		o := orm.NewOrm()
 		if cnt, err := o.QueryTable("courseRecord").Filter("Status", "即將上課").Filter("CourseRegistration", course).Count(); err == nil {
 
-			fmt.Println(cnt)
+			// 檢查是否有即將上課的課程單，如果有則檢查是否課程已經結束
 			if cnt != 0 {
+				// TODO 完成課程後給老師確認
 				continue
 			}
 
